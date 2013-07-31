@@ -3,6 +3,10 @@ package com.example.expense;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.expense.data.ExpenseCategoriesDataSource;
+import com.example.expense.models.ExpenseCategory;
+import com.example.expense.models.SummaryListItem;
+
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;

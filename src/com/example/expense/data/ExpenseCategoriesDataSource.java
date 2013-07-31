@@ -1,7 +1,9 @@
-package com.example.expense;
+package com.example.expense.data;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.expense.models.ExpenseCategory;
 
 import android.content.ContentValues;
 import android.content.Context;

@@ -3,6 +3,8 @@ package com.example.expense;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.expense.models.SummaryListItem;
+
 import android.os.Bundle;
 import android.view.Menu;
 import android.widget.ArrayAdapter;

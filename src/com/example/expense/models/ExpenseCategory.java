@@ -1,4 +1,4 @@
-package com.example.expense;
+package com.example.expense.models;
 
 public class ExpenseCategory {
 

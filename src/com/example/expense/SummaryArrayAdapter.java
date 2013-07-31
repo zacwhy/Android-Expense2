@@ -2,6 +2,8 @@ package com.example.expense;
 
 import java.util.List;
 
+import com.example.expense.models.SummaryListItem;
+
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
