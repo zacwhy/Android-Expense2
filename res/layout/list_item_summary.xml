@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+    <!-- 
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+     -->
+     
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_toLeftOf="@+id/amount"
+        android:text="The quick brown fox jumps over the lazy dog" />
+
+    <TextView
+        android:id="@+id/amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/label"
+        android:layout_alignBottom="@+id/label"
+        android:layout_marginRight="30dp"
+        android:layout_toLeftOf="@+id/percentage"
+        android:text="99.99" />
+
+    <TextView
+        android:id="@+id/percentage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/label"
+        android:layout_alignBottom="@+id/label"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:text="99.9%" />
+    
+</RelativeLayout>
