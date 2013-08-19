@@ -2,14 +2,15 @@ package com.example.expense;
 
 import java.util.List;
 
-import com.example.expense.models.SummaryListItem;
-
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import com.example.expense.helpers.FormatHelper;
+import com.example.expense.models.SummaryListItem;
 
 public class SummaryArrayAdapter extends ArrayAdapter<SummaryListItem> {
 
@@ -21,7 +22,6 @@ public class SummaryArrayAdapter extends ArrayAdapter<SummaryListItem> {
 	static class ViewHolder {
 		public TextView label;
 		public TextView amount;
-		public TextView percentage;
 	}
 
 	public SummaryArrayAdapter(Activity context, List<SummaryListItem> list) {
@@ -40,15 +40,13 @@ public class SummaryArrayAdapter extends ArrayAdapter<SummaryListItem> {
 			ViewHolder viewHolder = new ViewHolder();
 			viewHolder.label = (TextView) rowView.findViewById(R.id.label);
 			viewHolder.amount = (TextView) rowView.findViewById(R.id.amount);
-			viewHolder.percentage = (TextView) rowView.findViewById(R.id.percentage);
 			rowView.setTag(viewHolder);
 		}
 
 		ViewHolder holder = (ViewHolder) rowView.getTag();
 		SummaryListItem summaryListItem = list.get(position);
 		holder.label.setText(summaryListItem.getLabel());
-		holder.amount.setText(Double.toString(summaryListItem.getAmount()));
-		holder.percentage.setText("99.9%"); // TODO: 
+		holder.amount.setText(FormatHelper.formatMoney(summaryListItem.getAmount()));
 
 		return rowView;
 	}

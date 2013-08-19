@@ -1,9 +1,9 @@
 package com.example.expense.models;
 
-public class ExpenseCategory {
+public class Account {
 
 	private long id;
-	private String title;
+	private String name;
 	
 	public long getId() {
 		return id;
@@ -13,17 +13,17 @@ public class ExpenseCategory {
 		this.id = id;
 	}
 	
-	public String getTitle() {
-		return title;
+	public String getName() {
+		return name;
 	}
 	
-	public void setTitle(String title) {
-		this.title = title;
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	@Override
 	public String toString() {
-		return getTitle();
+		return getName();
 	}
 	
 }

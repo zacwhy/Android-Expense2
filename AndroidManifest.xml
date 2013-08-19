@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="8"
+        android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
     <application
@@ -29,6 +29,18 @@
         <activity
             android:name="com.example.expense.EntryActivity"
             android:label="@string/title_activity_entry" >
+        </activity>
+        <activity
+            android:name="com.example.expense.SummaryTwoActivity"
+            android:label="@string/title_activity_summary_two" >
+        </activity>
+        <activity
+            android:name="com.example.expense.SummaryThreeActivity"
+            android:label="@string/title_activity_summary_three" >
+        </activity>
+        <activity
+            android:name="com.example.expense.SummaryBbbActivity"
+            android:label="@string/title_activity_summary_bbb" >
         </activity>
     </application>
 

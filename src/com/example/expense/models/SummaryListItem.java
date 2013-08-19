@@ -1,12 +1,14 @@
 package com.example.expense.models;
 
+import java.math.BigDecimal;
+
 public class SummaryListItem {
 
 	private String label;
-	private double amount;
+	private BigDecimal amount;
 	private double percentage;
 	
-	public SummaryListItem(String label, double amount, double percentage) {
+	public SummaryListItem(String label, BigDecimal amount, double percentage) {
 		this.setLabel(label);
 		this.setAmount(amount);
 		this.setPercentage(percentage);
@@ -20,11 +22,11 @@ public class SummaryListItem {
 		this.label = label;
 	}
 
-	public double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 

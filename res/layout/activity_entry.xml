@@ -16,28 +16,28 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/buttonDate"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="30-Jul-2013 Tue" />
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/imageButton1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_calendar"
             android:src="@android:drawable/ic_menu_today" />
         
     </LinearLayout>
 
     <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView1"
+        android:id="@+id/autoCompleteTextViewDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Description">
+        android:hint="@string/hint_description" >
 
-        <requestFocus />
+        <!-- <requestFocus /> -->
     </AutoCompleteTextView>
 
     <LinearLayout
@@ -56,19 +56,25 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="5"
-            android:hint="Amount"
+            android:hint="@string/hint_amount"
             android:inputType="numberDecimal" />
 
         <ImageButton
             android:id="@+id/calculator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/content_description_calculator"
             android:src="@android:drawable/ic_dialog_dialer" />
         
     </LinearLayout>
+    
+    <Spinner
+        android:id="@+id/spinnerToAccount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <Spinner
-        android:id="@+id/category"
+        android:id="@+id/spinnerCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -85,7 +91,7 @@
             android:layout_alignBaseline="@+id/imageButton2"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:text="Tags" />
+            android:text="@string/label_tags" />
 
         <TextView
             android:id="@+id/txtTags"
@@ -94,8 +100,7 @@
             android:layout_alignParentTop="true"
             android:layout_marginLeft="20dp"
             android:layout_toLeftOf="@+id/imageButton2"
-            android:layout_toRightOf="@+id/lblTags"
-            android:text="Lunch, Drink, The quick brown fox jumps over the lazy dog" />
+            android:layout_toRightOf="@+id/lblTags" />
 
         <ImageButton
             android:id="@+id/imageButton2"
@@ -103,20 +108,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:contentDescription="@string/content_description_edit_tags"
             android:src="@android:drawable/ic_menu_edit" />
         
     </RelativeLayout>
-    
-    <ListView
-        android:id="@+id/paidFor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
 
     <Button
         android:id="@+id/add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="OK" />
+        android:onClick="addPayment"
+        android:text="@string/button_text_add" />
 
 </LinearLayout>

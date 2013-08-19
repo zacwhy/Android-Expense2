@@ -3,35 +3,37 @@ package com.example.expense.data;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.expense.models.ExpenseCategory;
-
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.example.expense.models.ExpenseCategory;
 
 public class ExpenseCategoriesDataSource {
 
 	private SQLiteDatabase database;
-	private ExpenseDbHelper dbHelper;
+	//private ExpenseDbHelper dbHelper;
 	
 	private String[] allColumns = { 
 			ExpenseContract.ExpenseCategory._ID,
 			ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE
 	};
-
-	public ExpenseCategoriesDataSource(Context context) {
-		dbHelper = new ExpenseDbHelper(context);
+	
+	public ExpenseCategoriesDataSource(SQLiteDatabase database) {
+		this.database = database;
 	}
 
-	public void open() throws SQLException {
-		database = dbHelper.getWritableDatabase();
-	}
-
-	public void close() {
-		dbHelper.close();
-	}
+//	public ExpenseCategoriesDataSource(Context context) {
+//		dbHelper = new ExpenseDbHelper(context);
+//	}
+//
+//	public void open() throws SQLException {
+//		database = dbHelper.getWritableDatabase();
+//	}
+//
+//	public void close() {
+//		dbHelper.close();
+//	}
 	
 	public long createExpenseCategory(String title) {
 		// Create a new map of values, where column names are the keys
@@ -71,7 +73,12 @@ public class ExpenseCategoriesDataSource {
 		return count;
 	}
 	
-	public List<ExpenseCategory> getAllExpenseCategories() {
+	public int deleteAll() {
+		int count = database.delete(ExpenseContract.ExpenseCategory.TABLE_NAME, "1", null);
+		return count;
+	}
+
+	public List<ExpenseCategory> getAll() {
 		List<ExpenseCategory> expenseCategories = new ArrayList<ExpenseCategory>();
 
 		Cursor cursor = database.query(ExpenseContract.ExpenseCategory.TABLE_NAME, allColumns,

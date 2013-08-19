@@ -28,46 +28,92 @@ public final class R {
     }
     public static final class id {
         public static final int LinearLayout2=0x7f090000;
-        public static final int RelativeLayout1=0x7f09000f;
-        public static final int RelativeLayout2=0x7f090008;
-        public static final int action_add=0x7f090014;
-        public static final int action_select_payees=0x7f090012;
-        public static final int action_settings=0x7f090013;
+        public static final int RelativeLayout1=0x7f090019;
+        public static final int RelativeLayout2=0x7f090009;
+        public static final int action_add=0x7f09001d;
+        public static final int action_date_range=0x7f090021;
+        public static final int action_grouping=0x7f090022;
+        public static final int action_select_payees=0x7f09001b;
+        public static final int action_settings=0x7f09001c;
+        public static final int action_summary_bbb=0x7f090020;
+        public static final int action_summary_three=0x7f09001f;
+        public static final int action_summary_two=0x7f09001e;
         public static final int add=0x7f09000d;
         public static final int amount=0x7f090005;
-        public static final int autoCompleteTextView1=0x7f090003;
-        public static final int button1=0x7f090001;
+        public static final int autoCompleteTextViewDescription=0x7f090003;
+        public static final int buttonDate=0x7f090001;
         public static final int calculator=0x7f090006;
-        public static final int category=0x7f090007;
         public static final int imageButton1=0x7f090002;
-        public static final int imageButton2=0x7f09000a;
-        public static final int label=0x7f090010;
-        public static final int lblTags=0x7f090009;
+        public static final int imageButton2=0x7f09000b;
+        public static final int label=0x7f09001a;
+        public static final int lblTags=0x7f09000a;
         public static final int listview=0x7f09000e;
-        public static final int paidFor=0x7f09000c;
+        public static final int pager=0x7f09000f;
+        public static final int pager_title_strip=0x7f090010;
         public static final int paymentMethod=0x7f090004;
-        public static final int percentage=0x7f090011;
-        public static final int txtTags=0x7f09000b;
+        public static final int realtabcontent=0x7f090017;
+        public static final int section_label=0x7f090018;
+        public static final int spinnerCategory=0x7f090008;
+        public static final int spinnerToAccount=0x7f090007;
+        public static final int tab1=0x7f090012;
+        public static final int tab2=0x7f090013;
+        public static final int tab3=0x7f090015;
+        public static final int tabHost=0x7f090011;
+        public static final int textView2=0x7f090014;
+        public static final int textView3=0x7f090016;
+        public static final int txtTags=0x7f09000c;
     }
     public static final class layout {
         public static final int activity_entry=0x7f030000;
         public static final int activity_main=0x7f030001;
-        public static final int activity_summary=0x7f030002;
-        public static final int list_item_summary=0x7f030003;
+        public static final int activity_main2=0x7f030002;
+        public static final int activity_summary=0x7f030003;
+        public static final int activity_summary_bbb=0x7f030004;
+        public static final int activity_summary_three=0x7f030005;
+        public static final int activity_summary_two=0x7f030006;
+        public static final int fragment_summary_bbb_dummy=0x7f030007;
+        public static final int fragment_summary_two_dummy=0x7f030008;
+        public static final int list_item_summary=0x7f030009;
     }
     public static final class menu {
         public static final int entry=0x7f080000;
         public static final int main=0x7f080001;
         public static final int summary=0x7f080002;
+        public static final int summary_bbb=0x7f080003;
+        public static final int summary_three=0x7f080004;
+        public static final int summary_two=0x7f080005;
     }
     public static final class string {
         public static final int action_add=0x7f060002;
         public static final int action_select_payees=0x7f060003;
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
+        public static final int button_text_add=0x7f060009;
+        public static final int content_description_calculator=0x7f06000b;
+        public static final int content_description_calendar=0x7f06000a;
+        public static final int content_description_edit_tags=0x7f06000c;
         public static final int hello_world=0x7f060005;
+        public static final int hint_amount=0x7f060008;
+        public static final int hint_description=0x7f060007;
+        public static final int label_tags=0x7f06000d;
         public static final int title_activity_entry=0x7f060006;
         public static final int title_activity_summary=0x7f060004;
+        public static final int title_activity_summary_aaa=0x7f06001c;
+        public static final int title_activity_summary_bbb=0x7f06001d;
+        public static final int title_activity_summary_three=0x7f06001b;
+        public static final int title_activity_summary_two=0x7f06000e;
+        public static final int title_section1=0x7f06000f;
+        public static final int title_section10=0x7f060018;
+        public static final int title_section11=0x7f060019;
+        public static final int title_section12=0x7f06001a;
+        public static final int title_section2=0x7f060010;
+        public static final int title_section3=0x7f060011;
+        public static final int title_section4=0x7f060012;
+        public static final int title_section5=0x7f060013;
+        public static final int title_section6=0x7f060014;
+        public static final int title_section7=0x7f060015;
+        public static final int title_section8=0x7f060016;
+        public static final int title_section9=0x7f060017;
     }
     public static final class style {
         /** 
