@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.example.expense.helpers.DateHelper;
+import com.example.expense.helpers.SqlQueryHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -53,11 +54,17 @@ public class TransactionHelper {
     public List<Transaction> getTransactions() {
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         
-        String inTables = "\"transaction\" LEFT OUTER JOIN \"transaction_group\"" +
-                " ON \"transaction\".\"transaction_group_id\" = \"transaction_group\"." +
-                ExpenseContract.TransactionGroup._ID;
+        
+        String inTables = SqlQueryHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
+                ExpenseContract.Transaction.TABLE_NAME,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.Transaction.TABLE_NAME,
+                ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.TransactionGroup._ID);
         
         sqliteQueryBuilder.setTables(inTables);
+        
         
         String[] projectionIn = null;
         String selection = null;
@@ -65,16 +72,19 @@ public class TransactionHelper {
         String groupBy = null;
         String having = null;
         
-        String sortOrder = q(ExpenseContract.TransactionGroup.TABLE_NAME) + "." + 
-                q(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE) + " DESC, " +
-                q(ExpenseContract.TransactionGroup.TABLE_NAME) + "." +
-                q(ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE) + " DESC";
+        String sortOrder = SqlQueryHelper.format("%s.%s DESC, %s.%s DESC",
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE);
         
         Cursor cursor = sqliteQueryBuilder.query(database, projectionIn, selection, selectionArgs, 
                 groupBy, having, sortOrder);
         
+        
         Map<Long, Account> accounts = Helper.getAccountsMap(database);
         Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
+        
         
         List<Transaction> items = new ArrayList<Transaction>();
         
@@ -129,10 +139,6 @@ public class TransactionHelper {
         transaction.setDescription(description);
 
         return transaction;
-    }
-    
-    private static String q(String s) {
-        return "\"" + s + "\"";
     }
 
 }

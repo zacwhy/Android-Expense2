@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.expense.helpers.DateHelper;
+import com.example.expense.helpers.SqlQueryHelper;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
@@ -33,14 +34,16 @@ public class TransactionGroupsDataSource {
 		return newRowId;
 	}
 	
-	//@SuppressLint("SimpleDateFormat")
     public int getMaxSequence(Calendar date) {
 	    int sequence = 0;
-	    
-	    String dateString = DateHelper.getSqlDateString(date);
-	    
-        String sql = "SELECT MAX(\"sequence\") FROM \"transaction_group\"" + 
-                " WHERE datetime(\"date\"/1000, 'unixepoch') >= ?";
+        
+        String sql = SqlQueryHelper.format(
+                "SELECT MAX(%s) FROM %s WHERE date(%s/1000, 'unixepoch') = ?", 
+                ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.TransactionGroup.COLUMN_NAME_DATE);
+        
+        String dateString = DateHelper.getSqlDateString(date);
 
 	    Cursor cursor = database.rawQuery(sql, new String[] { dateString }); 
 	    
