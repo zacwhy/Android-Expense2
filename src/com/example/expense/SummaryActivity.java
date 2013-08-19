@@ -113,13 +113,13 @@ public class SummaryActivity extends ListActivity {
             String fromAccountName = transaction.getFromAccount().getName();
             String toAccountName = transaction.getToAccount().getName();
             
-            String s = DateHelper.getShortDateString(date) + " " + 
-                    transactionGroupSequence + "-" + transactionSequence + " " +
-                    "(" + expenseCategory.getTitle() + ") " +
+            String s = DateHelper.getDateTimeString(date) + " " + 
+                    transactionGroupSequence + "." + transactionSequence + " " +
                     description + 
-                    " (" + fromAccountName + " to " + toAccountName + ")";
+                    " [" + fromAccountName + " to " + toAccountName + "]" +
+                    " (" + expenseCategory.getTitle() + ")";
             
-            SummaryListItem summaryListItem = new SummaryListItem(s, amount, 4.56);
+            SummaryListItem summaryListItem = new SummaryListItem(s, amount, 0);
             list.add(summaryListItem);
         }
         

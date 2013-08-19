@@ -1,7 +1,6 @@
 package com.example.expense;
 
 import java.math.BigDecimal;
-import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import android.widget.Spinner;
 import com.example.expense.data.ExpenseDbHelper;
 import com.example.expense.data.Helper;
 import com.example.expense.data.TransactionHelper;
+import com.example.expense.helpers.DateHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -41,7 +41,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_entry);
 	    
-	    mDate = Calendar.getInstance();
+	    setCurrentDate();
 	    refreshDateOnView();
 	    addListenerOnButtonDate();
 	    
@@ -66,6 +66,14 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         startActivity(intent);
     }
     
+    private void setCurrentDate() {
+        mDate = Calendar.getInstance();
+        mDate.set(Calendar.HOUR_OF_DAY, 0);
+        mDate.set(Calendar.MINUTE, 0);
+        mDate.set(Calendar.SECOND, 0);
+        mDate.set(Calendar.MILLISECOND, 0);
+    }
+    
     private void addListenerOnButtonDate() {
         getButtonDate().setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,8 +84,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     private void refreshDateOnView() {
-        DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.LONG);
-        String dateString = dateFormat.format(mDate.getTime());
+        String dateString = DateHelper.getDateWithDayOfWeekString(mDate);
         getButtonDate().setText(dateString);
     }
 	

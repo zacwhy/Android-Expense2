@@ -50,7 +50,6 @@ public class TransactionHelper {
         return dataSource.insert(transaction);
     }
     
-    
     public List<Transaction> getTransactions() {
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         
@@ -65,7 +64,11 @@ public class TransactionHelper {
         String[] selectionArgs = null;
         String groupBy = null;
         String having = null;
-        String sortOrder = null;
+        
+        String sortOrder = q(ExpenseContract.TransactionGroup.TABLE_NAME) + "." + 
+                q(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE) + " DESC, " +
+                q(ExpenseContract.TransactionGroup.TABLE_NAME) + "." +
+                q(ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE) + " DESC";
         
         Cursor cursor = sqliteQueryBuilder.query(database, projectionIn, selection, selectionArgs, 
                 groupBy, having, sortOrder);
@@ -126,6 +129,10 @@ public class TransactionHelper {
         transaction.setDescription(description);
 
         return transaction;
+    }
+    
+    private static String q(String s) {
+        return "\"" + s + "\"";
     }
 
 }
