@@ -30,6 +30,8 @@ import com.example.expense.models.TransactionGroup;
 
 public class EntryActivity extends FragmentActivity implements OnDateSetListener {
     
+    public final static String EXTRA_TRANSACTION_ID = "com.example.expense.TRANSACTION_ID";
+    
     private Calendar mDate;
     private Spinner mSpinnerExpenseCategory;
     private Spinner mSpinnerFromAccount;
@@ -41,10 +43,17 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_entry);
 	    
-	    setCurrentDate();
+	    Intent intent = getIntent();
+	    long transactionId = intent.getLongExtra(EXTRA_TRANSACTION_ID, -1);
+	    
+	    if (transactionId == -1) {
+	        setCurrentDate();
+	    } else {
+	        setCurrentDate(); // TODO: getTransaction(transactionId);
+	    }
+	    
 	    refreshDateOnView();
 	    addListenerOnButtonDate();
-	    
 	    populateSpinners();
 	}
 	

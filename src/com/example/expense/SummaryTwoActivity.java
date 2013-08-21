@@ -129,15 +129,15 @@ public class SummaryTwoActivity extends FragmentActivity {
     private void loadListView(int i) {
         List<SummaryListItem> list = new ArrayList<SummaryListItem>();
         
-        if (i == 1) {
-            list.add(new SummaryListItem("a", new BigDecimal(1), 4.56));
-            list.add(new SummaryListItem("b", new BigDecimal(2), 4.56));
-            list.add(new SummaryListItem("c", new BigDecimal(3), 4.56));
-        } else {
-            list.add(new SummaryListItem("d", new BigDecimal(1), 4.56));
-            list.add(new SummaryListItem("e", new BigDecimal(2), 4.56));
-            list.add(new SummaryListItem("f", new BigDecimal(3), 4.56));
-        }
+//        if (i == 1) {
+//            list.add(new SummaryListItem("a", new BigDecimal(1), 4.56));
+//            list.add(new SummaryListItem("b", new BigDecimal(2), 4.56));
+//            list.add(new SummaryListItem("c", new BigDecimal(3), 4.56));
+//        } else {
+//            list.add(new SummaryListItem("d", new BigDecimal(1), 4.56));
+//            list.add(new SummaryListItem("e", new BigDecimal(2), 4.56));
+//            list.add(new SummaryListItem("f", new BigDecimal(3), 4.56));
+//        }
         
         SummaryArrayAdapter listAdapter = new SummaryArrayAdapter(this, list);
         //listAdapter.clear();

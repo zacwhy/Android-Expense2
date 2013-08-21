@@ -4,17 +4,27 @@ import java.math.BigDecimal;
 
 public class SummaryListItem {
 
+    private long id;
 	private String label;
 	private BigDecimal amount;
 	private double percentage;
 	
-	public SummaryListItem(String label, BigDecimal amount, double percentage) {
+	public SummaryListItem(long id, String label, BigDecimal amount, double percentage) {
+	    this.setId(id);
 		this.setLabel(label);
 		this.setAmount(amount);
 		this.setPercentage(percentage);
 	}
 
-	public String getLabel() {
+	public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getLabel() {
 		return label;
 	}
 

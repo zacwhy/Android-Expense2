@@ -6,11 +6,15 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.expense.data.ExpenseDbHelper;
 import com.example.expense.data.TransactionHelper;
@@ -57,6 +61,21 @@ public class SummaryActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	@Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+	    Context context = getApplicationContext();
+	    CharSequence text = "position: " + position + "; id:" + id;
+	    int duration = Toast.LENGTH_SHORT;
+
+	    Toast.makeText(context, text, duration).show();
+	    
+	    SummaryListItem summaryListItem = (SummaryListItem) getListView().getItemAtPosition(position);
+	    
+	    Intent intent = new Intent(this, EntryActivity.class);
+	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, summaryListItem.getId());
+        startActivity(intent);
+    }
+	
 //	@SuppressLint("NewApi")
 //	private void loadActionBar() {
 //		ActionBar actionBar = getActionBar();
@@ -101,6 +120,8 @@ public class SummaryActivity extends ListActivity {
 	    List<SummaryListItem> list = new ArrayList<SummaryListItem>();
         
         for (Transaction transaction : transactions) {
+            long id = transaction.getId();
+            
             TransactionGroup transactionGroup = transaction.getTransactionGroup();
             Calendar date = transactionGroup.getDate();
             int transactionGroupSequence = transactionGroup.getSequence();
@@ -119,7 +140,7 @@ public class SummaryActivity extends ListActivity {
                     " [" + fromAccountName + " to " + toAccountName + "]" +
                     " (" + expenseCategory.getTitle() + ")";
             
-            SummaryListItem summaryListItem = new SummaryListItem(s, amount, 0);
+            SummaryListItem summaryListItem = new SummaryListItem(id, s, amount, 0);
             list.add(summaryListItem);
         }
         
