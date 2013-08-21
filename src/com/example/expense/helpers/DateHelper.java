@@ -9,6 +9,10 @@ import java.util.GregorianCalendar;
 @SuppressLint("SimpleDateFormat")
 public final class DateHelper {
 
+    //
+    // Display
+    //
+    
     public static String getShortDateString(Calendar date) {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
         return dateFormat.format(date.getTime());
@@ -18,18 +22,39 @@ public final class DateHelper {
         return new SimpleDateFormat("yyyy-MM-dd E").format(date.getTime());
     }
     
+    public static String getDateTimeString(Calendar date) {
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date.getTime());
+    }
+
+    
+    //
+    // SQL
+    //
+    
     public static String getSqlDateString(Calendar date) {
         return new SimpleDateFormat("yyyy-MM-dd").format(date.getTime());
     }
     
-    public static String getDateTimeString(Calendar date) {
+    public static String getSqlDateTimeString(Calendar date) {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date.getTime());
     }
     
-    public static Calendar getDate(long millis) {
-        Calendar date = new GregorianCalendar();
-        date.setTimeInMillis(millis);
-        return date;
+    
+    //
+    //
+    //
+    
+    public static Calendar getCalendarFromMilliseconds(long millis) {
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(millis);
+        return calendar;
+    }
+    
+    public static Calendar getUniversalTime(Calendar calendar) {
+        int offset = calendar.getTimeZone().getOffset(calendar.getTimeInMillis());
+        long millis = calendar.getTimeInMillis() - offset;
+        Calendar universalTimeCalendar = getCalendarFromMilliseconds(millis);
+        return universalTimeCalendar;
     }
 
 }

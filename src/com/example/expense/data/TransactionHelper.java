@@ -111,7 +111,7 @@ public class TransactionHelper {
         String description = cursor.getString(6);
         
         //long transactionGroupId2 = cursor.getLong(7); // TODO
-        Calendar date = DateHelper.getDate(cursor.getLong(8));
+        Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(8));
         int transactionGroupSequence = cursor.getInt(9);
         long expenseCategoryId = cursor.getLong(10);
         
