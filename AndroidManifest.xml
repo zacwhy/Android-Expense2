@@ -28,7 +28,8 @@
         </activity>
         <activity
             android:name="com.example.expense.EntryActivity"
-            android:label="@string/title_activity_entry" >
+            android:label="@string/title_activity_entry"
+            android:theme="@android:style/Theme.Dialog">
         </activity>
         <activity
             android:name="com.example.expense.SummaryTwoActivity"

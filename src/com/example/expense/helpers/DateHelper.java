@@ -23,7 +23,7 @@ public final class DateHelper {
     }
     
     public static String getDateTimeString(Calendar date) {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date.getTime());
+        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(date.getTime());
     }
 
     

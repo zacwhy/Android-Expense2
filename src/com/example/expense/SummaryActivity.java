@@ -45,7 +45,7 @@ public class SummaryActivity extends ListActivity {
 		switch (item.getItemId()) {
 		case R.id.action_add:
 			Intent intent = new Intent(this, EntryActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, 0);
 			return true;
 
 	      case R.id.action_summary_two:
@@ -74,6 +74,10 @@ public class SummaryActivity extends ListActivity {
 	    Intent intent = new Intent(this, EntryActivity.class);
 	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, summaryListItem.getId());
         startActivity(intent);
+    }
+    
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        loadListView();
     }
 	
 //	@SuppressLint("NewApi")

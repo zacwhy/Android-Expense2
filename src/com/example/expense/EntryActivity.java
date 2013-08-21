@@ -43,6 +43,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_entry);
 	    
+	    this.setFinishOnTouchOutside(false);
+	    
 	    Intent intent = getIntent();
 	    long transactionId = intent.getLongExtra(EXTRA_TRANSACTION_ID, -1);
 	    
@@ -71,8 +73,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     public void addPayment(View view) {
         savePayment();
-        Intent intent = new Intent(this, SummaryActivity.class);
-        startActivity(intent);
+        finish();
     }
     
     private void setCurrentDate() {

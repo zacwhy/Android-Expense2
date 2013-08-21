@@ -18,6 +18,8 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(this, SummaryActivity.class);
         startActivity(intent);
         
+        finish();
+        
         //setContentView(R.layout.activity_main);
     }
 
