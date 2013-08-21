@@ -33,6 +33,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     public final static String EXTRA_TRANSACTION_ID = "com.example.expense.TRANSACTION_ID";
     
     private Calendar mDate;
+    
+    private EditText mEditTextAmount;
     private Spinner mSpinnerExpenseCategory;
     private Spinner mSpinnerFromAccount;
     private Spinner mSpinnerToAccount;
@@ -72,10 +74,12 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     public void addPayment(View view) {
-        savePayment();
-        finish();
+        if (validateInputs()) {
+            saveTransaction();
+            finish();
+        }
     }
-    
+
     private void setCurrentDate() {
         mDate = Calendar.getInstance();
         mDate.set(Calendar.HOUR_OF_DAY, 0);
@@ -152,7 +156,16 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
     
-    private void savePayment() {
+    private boolean validateInputs() {
+        if (getEditTextAmount().getText().length() == 0) {
+            getEditTextAmount().setError(getString(R.string.error_required_amount));
+            return false;
+        }
+        
+        return true;
+    }
+
+    private void saveTransaction() {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         
@@ -177,8 +190,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         transaction.setToAccount(toAccount);
         
         // amount
-        EditText editTextAmount = (EditText) findViewById(R.id.amount);
-        BigDecimal amount = new BigDecimal(editTextAmount.getText().toString());
+        BigDecimal amount = new BigDecimal(getEditTextAmount().getText().toString());
         transaction.setAmount(amount);
         
         // description
@@ -200,6 +212,13 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         transactionGroup.setExpenseCategory(expenseCategory);
         
         return transactionGroup;
+    }
+    
+    private EditText getEditTextAmount() {
+        if (mEditTextAmount == null) {
+            mEditTextAmount = (EditText) findViewById(R.id.amount);
+        }
+        return mEditTextAmount;
     }
     
     private Spinner getSpinnerExpenseCategory() {

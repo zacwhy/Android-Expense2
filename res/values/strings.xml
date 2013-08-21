@@ -5,6 +5,7 @@
     <string name="action_settings">Settings</string>
     <string name="action_add">TODO: Remove</string>
     <string name="action_select_payees">Add or remove payees</string>
+    <string name="error_required_amount">Amount is required!</string>
     <string name="title_activity_summary">Transactions</string>
     <string name="hello_world">TODO: Remove</string>
     <string name="title_activity_entry">New Expense</string>
