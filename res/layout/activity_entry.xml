@@ -114,10 +114,9 @@
     </RelativeLayout>
 
     <Button
-        android:id="@+id/add"
+        android:id="@+id/buttonOk"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="addPayment"
         android:text="@string/button_text_add" />
-
+    
 </LinearLayout>

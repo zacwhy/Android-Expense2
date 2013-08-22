@@ -5,7 +5,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.DatePickerDialog.OnDateSetListener;
-import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -32,11 +31,12 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     public final static String EXTRA_TRANSACTION_ID = "com.example.expense.TRANSACTION_ID";
     
+    private long mTransactionId;
     private Calendar mDate;
     
-    private ArrayAdapter<Account> fromAccountArrayAdapter;
-    private ArrayAdapter<Account> toAccountArrayAdapter;
-    private ArrayAdapter<ExpenseCategory> expenseCategoryArrayAdapter;
+    private ArrayAdapter<Account> mFromAccountArrayAdapter;
+    private ArrayAdapter<Account> mToAccountArrayAdapter;
+    private ArrayAdapter<ExpenseCategory> mExpenseCategoryArrayAdapter;
 
     private AutoCompleteTextView mAutoCompleteTextViewDescription;
     private EditText mEditTextAmount;
@@ -49,19 +49,16 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	protected void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_entry);
-	    
 	    setFinishOnTouchOutside(false);
-
 	    populateSpinners();
-        addListenerOnButtonDate();
+        addListeners();
 	    
-	    Intent intent = getIntent();
-	    long transactionId = intent.getLongExtra(EXTRA_TRANSACTION_ID, -1);
+	    mTransactionId = getIntent().getLongExtra(EXTRA_TRANSACTION_ID, 0);
 	    
-	    if (transactionId == -1) {
+	    if (isNewTransaction()) {
 	        setCurrentDate();
 	    } else {
-	        Transaction transaction = TransactionHelper.getTransaction(this, transactionId);
+	        Transaction transaction = TransactionHelper.getTransaction(this, mTransactionId);
 	        populateFields(transaction);
 	    }
 	    
@@ -80,11 +77,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    refreshDateOnView();
     }
     
-    public void addPayment(View view) {
-        if (validateInputs()) {
-            saveTransaction();
-            finish();
-        }
+    private boolean isNewTransaction() {
+        return mTransactionId == 0;
     }
 
     private void setCurrentDate() {
@@ -95,11 +89,19 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         mDate.set(Calendar.MILLISECOND, 0);
     }
     
-    private void addListenerOnButtonDate() {
+    private void addListeners() {
         getButtonDate().setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePickerDialog(v);
+            }
+        });
+        
+        Button buttonOk = (Button) findViewById(R.id.buttonOk);
+        buttonOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveTransaction();
             }
         });
     }
@@ -124,30 +126,30 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	}
     
     private void populateFromAccountSpinner(List<Account> accounts) {
-        fromAccountArrayAdapter = new ArrayAdapter<Account>(this,
+        mFromAccountArrayAdapter = new ArrayAdapter<Account>(this,
                 android.R.layout.simple_spinner_item, accounts);
-        fromAccountArrayAdapter.setDropDownViewResource(
+        mFromAccountArrayAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         
-        getSpinnerFromAccount().setAdapter(fromAccountArrayAdapter);
+        getSpinnerFromAccount().setAdapter(mFromAccountArrayAdapter);
     }
 	
     private void populateToAccountSpinner(List<Account> accounts) {
-        toAccountArrayAdapter = new ArrayAdapter<Account>(this,
+        mToAccountArrayAdapter = new ArrayAdapter<Account>(this,
                 android.R.layout.simple_spinner_item, accounts);
-        toAccountArrayAdapter.setDropDownViewResource(
+        mToAccountArrayAdapter.setDropDownViewResource(
                 android.R.layout.simple_spinner_dropdown_item);
         
-        getSpinnerToAccount().setAdapter(toAccountArrayAdapter);
+        getSpinnerToAccount().setAdapter(mToAccountArrayAdapter);
     }
 	
 	private void populateExpenseCategorySpinner(List<ExpenseCategory> expenseCategories) {
-	    expenseCategoryArrayAdapter= new ArrayAdapter<ExpenseCategory>(this,
+	    mExpenseCategoryArrayAdapter= new ArrayAdapter<ExpenseCategory>(this,
 				android.R.layout.simple_spinner_item, expenseCategories);
-	    expenseCategoryArrayAdapter.setDropDownViewResource(
+	    mExpenseCategoryArrayAdapter.setDropDownViewResource(
 	            android.R.layout.simple_spinner_dropdown_item);
 		
-		getSpinnerExpenseCategory().setAdapter(expenseCategoryArrayAdapter);
+		getSpinnerExpenseCategory().setAdapter(mExpenseCategoryArrayAdapter);
 	}
 
     private void populateFields(Transaction transaction) {
@@ -162,17 +164,17 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     private void setSpinnerFromAccountSelection(Account fromAccount) {
-        int position = getAccountPosition(fromAccount, fromAccountArrayAdapter);
+        int position = getAccountPosition(fromAccount, mFromAccountArrayAdapter);
         getSpinnerFromAccount().setSelection(position);
     }
     
     private void setSpinnerToAccountSelection(Account toAccount) {
-        int position = getAccountPosition(toAccount, toAccountArrayAdapter);
+        int position = getAccountPosition(toAccount, mToAccountArrayAdapter);
         getSpinnerToAccount().setSelection(position);
     }
     
     private void setSpinnerExpenseCategorySelection(ExpenseCategory expenseCategory) {
-        int position = getExpenseCategoryPosition(expenseCategory, expenseCategoryArrayAdapter);
+        int position = getExpenseCategoryPosition(expenseCategory, mExpenseCategoryArrayAdapter);
         getSpinnerExpenseCategory().setSelection(position);
     }
 	
@@ -192,6 +194,15 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
     
+    private void saveTransaction() {
+        if (validateInputs()) {
+            if (isNewTransaction()) {
+                insertTransaction();
+            }
+            finish();
+        }
+    }
+    
     private boolean validateInputs() {
         if (getEditTextAmount().getText().length() == 0) {
             getEditTextAmount().setError(getString(R.string.error_required_amount));
@@ -201,7 +212,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         return true;
     }
 
-    private void saveTransaction() {
+    private void insertTransaction() {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         
