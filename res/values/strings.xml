@@ -8,7 +8,7 @@
     <string name="error_required_amount">Amount is required!</string>
     <string name="title_activity_summary">Transactions</string>
     <string name="hello_world">TODO: Remove</string>
-    <string name="title_activity_entry">New Expense</string>
+    <string name="title_activity_entry">Transaction</string>
     <string name="hint_description">Description</string>
     <string name="hint_amount">Amount</string>
     <string name="button_text_add">OK</string>

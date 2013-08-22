@@ -69,10 +69,10 @@ public class SummaryActivity extends ListActivity {
 
 	    Toast.makeText(context, text, duration).show();
 	    
-	    SummaryListItem summaryListItem = (SummaryListItem) getListView().getItemAtPosition(position);
+	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
-	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, summaryListItem.getId());
+	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, listItem.getId());
         startActivity(intent);
     }
     
@@ -101,13 +101,13 @@ public class SummaryActivity extends ListActivity {
 //	}
 	
 	private void loadListView() {
-	    List<Transaction> transactions = GetTransactions();
+	    List<Transaction> transactions = getTransactions();
 	    List<SummaryListItem> list = getSummaryListItem(transactions);
 	    SummaryArrayAdapter summaryArrayAdapter = new SummaryArrayAdapter(this, list);
 		setListAdapter(summaryArrayAdapter);
 	}
 	
-	private List<Transaction> GetTransactions() {
+	private List<Transaction> getTransactions() {
 	    ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
 	    
         SQLiteDatabase database = dbHelper.getReadableDatabase();

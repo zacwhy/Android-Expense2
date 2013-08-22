@@ -34,6 +34,11 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     private Calendar mDate;
     
+    private ArrayAdapter<Account> fromAccountArrayAdapter;
+    private ArrayAdapter<Account> toAccountArrayAdapter;
+    private ArrayAdapter<ExpenseCategory> expenseCategoryArrayAdapter;
+
+    private AutoCompleteTextView mAutoCompleteTextViewDescription;
     private EditText mEditTextAmount;
     private Spinner mSpinnerExpenseCategory;
     private Spinner mSpinnerFromAccount;
@@ -45,7 +50,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.activity_entry);
 	    
-	    this.setFinishOnTouchOutside(false);
+	    setFinishOnTouchOutside(false);
+
+	    populateSpinners();
+        addListenerOnButtonDate();
 	    
 	    Intent intent = getIntent();
 	    long transactionId = intent.getLongExtra(EXTRA_TRANSACTION_ID, -1);
@@ -53,12 +61,11 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    if (transactionId == -1) {
 	        setCurrentDate();
 	    } else {
-	        setCurrentDate(); // TODO: getTransaction(transactionId);
+	        Transaction transaction = TransactionHelper.getTransaction(this, transactionId);
+	        populateFields(transaction);
 	    }
 	    
 	    refreshDateOnView();
-	    addListenerOnButtonDate();
-	    populateSpinners();
 	}
 	
 	@Override
@@ -117,28 +124,57 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	}
     
     private void populateFromAccountSpinner(List<Account> accounts) {
-        ArrayAdapter<Account> spinnerArrayAdapter = new ArrayAdapter<Account>(this,
+        fromAccountArrayAdapter = new ArrayAdapter<Account>(this,
                 android.R.layout.simple_spinner_item, accounts);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        fromAccountArrayAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
         
-        getSpinnerFromAccount().setAdapter(spinnerArrayAdapter);
+        getSpinnerFromAccount().setAdapter(fromAccountArrayAdapter);
     }
 	
     private void populateToAccountSpinner(List<Account> accounts) {
-        ArrayAdapter<Account> spinnerArrayAdapter = new ArrayAdapter<Account>(this,
+        toAccountArrayAdapter = new ArrayAdapter<Account>(this,
                 android.R.layout.simple_spinner_item, accounts);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        toAccountArrayAdapter.setDropDownViewResource(
+                android.R.layout.simple_spinner_dropdown_item);
         
-        getSpinnerToAccount().setAdapter(spinnerArrayAdapter);
+        getSpinnerToAccount().setAdapter(toAccountArrayAdapter);
     }
 	
 	private void populateExpenseCategorySpinner(List<ExpenseCategory> expenseCategories) {
-		ArrayAdapter<ExpenseCategory> spinnerArrayAdapter = new ArrayAdapter<ExpenseCategory>(this,
+	    expenseCategoryArrayAdapter= new ArrayAdapter<ExpenseCategory>(this,
 				android.R.layout.simple_spinner_item, expenseCategories);
-		spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	    expenseCategoryArrayAdapter.setDropDownViewResource(
+	            android.R.layout.simple_spinner_dropdown_item);
 		
-		getSpinnerExpenseCategory().setAdapter(spinnerArrayAdapter);
+		getSpinnerExpenseCategory().setAdapter(expenseCategoryArrayAdapter);
 	}
+
+    private void populateFields(Transaction transaction) {
+        mDate = transaction.getTransactionGroup().getDate();
+        
+        getAutoCompleteTextViewDescription().setText(transaction.getDescription());
+        getEditTextAmount().setText(transaction.getAmount().toPlainString());
+        
+        setSpinnerFromAccountSelection(transaction.getFromAccount());
+        setSpinnerToAccountSelection(transaction.getToAccount());
+        setSpinnerExpenseCategorySelection(transaction.getTransactionGroup().getExpenseCategory());
+    }
+    
+    private void setSpinnerFromAccountSelection(Account fromAccount) {
+        int position = getAccountPosition(fromAccount, fromAccountArrayAdapter);
+        getSpinnerFromAccount().setSelection(position);
+    }
+    
+    private void setSpinnerToAccountSelection(Account toAccount) {
+        int position = getAccountPosition(toAccount, toAccountArrayAdapter);
+        getSpinnerToAccount().setSelection(position);
+    }
+    
+    private void setSpinnerExpenseCategorySelection(ExpenseCategory expenseCategory) {
+        int position = getExpenseCategoryPosition(expenseCategory, expenseCategoryArrayAdapter);
+        getSpinnerExpenseCategory().setSelection(position);
+    }
 	
 	private void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
@@ -194,9 +230,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         transaction.setAmount(amount);
         
         // description
-        AutoCompleteTextView autoCompleteTextViewDescription = 
-                (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewDescription);
-        String description = autoCompleteTextViewDescription.getText().toString();
+        String description = getAutoCompleteTextViewDescription().getText().toString();
         transaction.setDescription(description);
         
         return transaction;
@@ -212,6 +246,14 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         transactionGroup.setExpenseCategory(expenseCategory);
         
         return transactionGroup;
+    }
+    
+    private AutoCompleteTextView getAutoCompleteTextViewDescription() {
+        if (mAutoCompleteTextViewDescription == null) {
+            mAutoCompleteTextViewDescription = 
+                    (AutoCompleteTextView) findViewById(R.id.autoCompleteTextViewDescription);
+        }
+        return mAutoCompleteTextViewDescription;
     }
     
     private EditText getEditTextAmount() {
@@ -247,6 +289,27 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             mButtonDate = (Button) findViewById(R.id.buttonDate);
         }
         return mButtonDate;
+    }
+    
+    private static int getAccountPosition(Account target, ArrayAdapter<Account> arrayAdapter) {
+        for (int position = 0; position < arrayAdapter.getCount(); position++)  {
+            Account account = arrayAdapter.getItem(position);
+            if (account.getId() == target.getId()) {
+                return position;
+            }
+        }
+        return -1;
+    }
+
+    private static int getExpenseCategoryPosition(ExpenseCategory target, 
+            ArrayAdapter<ExpenseCategory> arrayAdapter) {
+        for (int position = 0; position < arrayAdapter.getCount(); position++)  {
+            ExpenseCategory expenseCategory = arrayAdapter.getItem(position);
+            if (expenseCategory.getId() == target.getId()) {
+                return position;
+            }
+        }
+        return -1;
     }
 
 }

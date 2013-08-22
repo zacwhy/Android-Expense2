@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
@@ -20,6 +21,19 @@ import com.example.expense.models.TransactionGroup;
 public class TransactionHelper {
     
     private SQLiteDatabase database;
+    
+    public static Transaction getTransaction(Context context, long id) {
+        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
+
+        SQLiteDatabase database = dbHelper.getReadableDatabase();
+
+        TransactionHelper transactionHelper = new TransactionHelper(database);
+        Transaction transaction = transactionHelper.getTransaction(id);
+
+        dbHelper.close();
+
+        return transaction;
+    }
 
     public TransactionHelper(SQLiteDatabase database) {
         this.database = database;
@@ -51,7 +65,30 @@ public class TransactionHelper {
         return dataSource.insert(transaction);
     }
     
+    public Transaction getTransaction(long id) {
+        String selection = SqlQueryHelper.format("%s.%s = ?", 
+                ExpenseContract.Transaction.TABLE_NAME,
+                ExpenseContract.Transaction._ID);
+        
+        String[] selectionArgs = new String[] { Long.toString(id) };
+        
+        List<Transaction> transactions = getTransactionsWithParameters(selection, selectionArgs);
+        
+        if (transactions.size() == 0) {
+            return null;
+        }
+        
+        Transaction transaction = transactions.get(0);
+        
+        return transaction;
+    }
+    
     public List<Transaction> getTransactions() {
+        return getTransactionsWithParameters(null, null);
+    }
+    
+    private List<Transaction> getTransactionsWithParameters(String selection, 
+            String[] selectionArgs) {
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         
         
@@ -67,8 +104,6 @@ public class TransactionHelper {
         
         
         String[] projectionIn = null;
-        String selection = null;
-        String[] selectionArgs = null;
         String groupBy = null;
         String having = null;
         
