@@ -15,13 +15,15 @@ import android.widget.ListView;
 
 import com.example.expense.data.TransactionHelper;
 import com.example.expense.helpers.DateHelper;
-import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
 
 public class SummaryActivity extends ListActivity {
 
+    private SummaryArrayAdapter mSummaryArrayAdapter;
+    private int mPosition;
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -58,22 +60,34 @@ public class SummaryActivity extends ListActivity {
 	
 	@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        mPosition = position;
+        
 	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
 	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, listItem.getId());
 	    startActivityForResult(intent, 0);
     }
-    
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        loadListView();
-    }
 	
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (data != null) {
+            String action = data.getStringExtra(EntryActivity.EXTRA_ACTION);
+            
+            if (action.contentEquals(EntryActivity.ACTION_DELETE)) {
+                mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
+            }
+        } else {
+            loadListView(); // TODO remove
+        }
+    }
+    
 	private void loadListView() {
 	    List<Transaction> transactions = TransactionHelper.getTransactions(this);
 	    List<SummaryListItem> list = getSummaryListItems(transactions);
-	    SummaryArrayAdapter summaryArrayAdapter = new SummaryArrayAdapter(this, list);
-		setListAdapter(summaryArrayAdapter);
+	    mSummaryArrayAdapter = new SummaryArrayAdapter(this, list);
+		setListAdapter(mSummaryArrayAdapter);
 	}
 	
 	private List<SummaryListItem> getSummaryListItems(List<Transaction> transactions) {
@@ -81,30 +95,25 @@ public class SummaryActivity extends ListActivity {
         
         for (Transaction transaction : transactions) {
             long id = transaction.getId();
-            
-            TransactionGroup transactionGroup = transaction.getTransactionGroup();
-            Calendar date = transactionGroup.getDate();
-            int transactionGroupSequence = transactionGroup.getSequence();
-            int transactionSequence = transaction.getSequence();
-            
-            ExpenseCategory expenseCategory = transactionGroup.getExpenseCategory();
-            
-            String description = transaction.getDescription();
+            String label = getLabel(transaction);
             BigDecimal amount = transaction.getAmount();
-            String fromAccountName = transaction.getFromAccount().getName();
-            String toAccountName = transaction.getToAccount().getName();
-            
-            String s = DateHelper.getDateTimeString(date) + " " + 
-                    transactionGroupSequence + "." + transactionSequence + " " +
-                    description + 
-                    " [" + fromAccountName + " to " + toAccountName + "]" +
-                    " (" + expenseCategory.getTitle() + ")";
-            
-            SummaryListItem summaryListItem = new SummaryListItem(id, s, amount, 0);
+            SummaryListItem summaryListItem = new SummaryListItem(id, label, amount, 0);
             list.add(summaryListItem);
         }
         
         return list;
+	}
+	
+	private static String getLabel(Transaction transaction) {
+	    TransactionGroup transactionGroup = transaction.getTransactionGroup();
+        Calendar date = transactionGroup.getDate();
+        int transactionGroupSequence = transactionGroup.getSequence();
+        int transactionSequence = transaction.getSequence();
+        String description = transaction.getDescription();
+        
+        return DateHelper.getDateWithDayOfWeekString(date) + " " + 
+                transactionGroupSequence + "." + transactionSequence + " " +
+                description; 
 	}
 
 }

@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -30,6 +31,9 @@ import com.example.expense.models.TransactionGroup;
 public class EntryActivity extends FragmentActivity implements OnDateSetListener {
     
     public final static String EXTRA_TRANSACTION_ID = "com.example.expense.TRANSACTION_ID";
+    public final static String EXTRA_ACTION = "com.example.expense.ACTION";
+    
+    public final static String ACTION_DELETE = "delete";
     
     private long mTransactionId;
     private Transaction mTransaction;
@@ -217,6 +221,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     private void onClickButtonDelete() {
         TransactionHelper.deleteTransactionGroup(this, mTransaction.getTransactionGroup());
+        
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_ACTION, ACTION_DELETE);
+        setResult(RESULT_OK, intent);
         finish();
     }
 
@@ -230,8 +238,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     private void updateTransaction() {
-        // TODO
-        
+
     }
     
     private Transaction getTransaction() {
