@@ -14,7 +14,7 @@ public final class SqlQueryHelper {
         return String.format(format, list.toArray());
     }
 
-    private static String quote(String s) {
+    public static String quote(String s) {
         return "\"" + s + "\"";
     }
    

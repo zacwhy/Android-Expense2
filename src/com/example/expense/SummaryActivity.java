@@ -6,17 +6,13 @@ import java.util.Calendar;
 import java.util.List;
 
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.example.expense.data.ExpenseDbHelper;
 import com.example.expense.data.TransactionHelper;
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.models.ExpenseCategory;
@@ -29,7 +25,6 @@ public class SummaryActivity extends ListActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//loadActionBar();
 		loadListView();
 	}
 
@@ -63,64 +58,25 @@ public class SummaryActivity extends ListActivity {
 	
 	@Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-	    Context context = getApplicationContext();
-	    CharSequence text = "position: " + position + "; id:" + id;
-	    int duration = Toast.LENGTH_SHORT;
-
-	    Toast.makeText(context, text, duration).show();
-	    
 	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
 	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, listItem.getId());
-        startActivity(intent);
+	    startActivityForResult(intent, 0);
     }
     
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         loadListView();
     }
 	
-//	@SuppressLint("NewApi")
-//	private void loadActionBar() {
-//		ActionBar actionBar = getActionBar();
-//		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-//		actionBar.setDisplayShowTitleEnabled(false);
-//
-//		SpinnerAdapter mSpinnerAdapter = ArrayAdapter.createFromResource(this, R.array.action_list,
-//		          android.R.layout.simple_spinner_dropdown_item);
-//		
-//		ActionBar.OnNavigationListener navigationListener = new OnNavigationListener() {
-//			@Override
-//			public boolean onNavigationItemSelected(int itemPosition, long itemId) {
-//				//lanuchItemSelected(itemPosition);
-//				return true;
-//			}
-//		};
-//
-//		actionBar.setListNavigationCallbacks(mSpinnerAdapter, navigationListener);
-//	}
-	
 	private void loadListView() {
-	    List<Transaction> transactions = getTransactions();
-	    List<SummaryListItem> list = getSummaryListItem(transactions);
+	    List<Transaction> transactions = TransactionHelper.getTransactions(this);
+	    List<SummaryListItem> list = getSummaryListItems(transactions);
 	    SummaryArrayAdapter summaryArrayAdapter = new SummaryArrayAdapter(this, list);
 		setListAdapter(summaryArrayAdapter);
 	}
 	
-	private List<Transaction> getTransactions() {
-	    ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
-	    
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        
-        TransactionHelper transactionHelper = new TransactionHelper(database);
-        List<Transaction> transactions = transactionHelper.getTransactions();
-        
-        dbHelper.close();
-        
-        return transactions;
-	}
-	
-	private List<SummaryListItem> getSummaryListItem(List<Transaction> transactions) {
+	private List<SummaryListItem> getSummaryListItems(List<Transaction> transactions) {
 	    List<SummaryListItem> list = new ArrayList<SummaryListItem>();
         
         for (Transaction transaction : transactions) {

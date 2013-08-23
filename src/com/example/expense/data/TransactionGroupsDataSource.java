@@ -12,7 +12,8 @@ import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
 	
-	private static final String TABLE_NAME = ExpenseContract.TransactionGroup.TABLE_NAME;
+	private static final String TABLE_NAME = 
+	        SqlQueryHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
 
 	private SQLiteDatabase database;
 	
@@ -20,7 +21,13 @@ public class TransactionGroupsDataSource {
 		this.database = database;
 	}
 	
-	public long insert(TransactionGroup transactionGroup) {
+	public long insertAtEnd(TransactionGroup transactionGroup) {
+        int sequence = getMaxSequence(transactionGroup.getDate()) + 1;
+        transactionGroup.setSequence(sequence);
+        return insert(transactionGroup);
+	}
+	
+	private long insert(TransactionGroup transactionGroup) {
 		ContentValues values = new ContentValues();
 		
 		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
@@ -34,11 +41,30 @@ public class TransactionGroupsDataSource {
 		return newRowId;
 	}
 	
-    public int getMaxSequence(Calendar calendar) {
+	public int deleteByTransactionGroup(TransactionGroup transactionGroup) {
+        return deleteByTransactionGroupId(transactionGroup.getId());
+	}
+	
+	public int deleteByTransactionGroupId(long transactionGroupId) {
+	    // Delete child records first
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
+        transactionsDataSource.deleteByTransactionGroupId(transactionGroupId);
+        
+        String whereClause = ExpenseContract.TransactionGroup._ID + " = ?";
+        String[] whereArgs = new String[] { Long.toString(transactionGroupId) };
+        return delete(whereClause, whereArgs);
+    }
+	
+	private int delete(String whereClause, String[] whereArgs) {
+	    int rowsAffected = database.delete(TABLE_NAME, whereClause, whereArgs);
+        return rowsAffected;
+	}
+	
+	private int getMaxSequence(Calendar calendar) {
 	    int sequence = 0;
 
 	    String sql = SqlQueryHelper.format("SELECT MAX(%s) FROM %s" +
-	            " WHERE datetime(%s/1000, 'unixepoch') between ? and datetime(?, '+1 day')",
+	            " WHERE datetime(%s/1000, 'unixepoch') BETWEEN ? AND datetime(?, '+1 day')",
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE,
 	            ExpenseContract.TransactionGroup.TABLE_NAME,
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_DATE);

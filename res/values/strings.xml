@@ -11,7 +11,8 @@
     <string name="title_activity_entry">Transaction</string>
     <string name="hint_description">Description</string>
     <string name="hint_amount">Amount</string>
-    <string name="button_text_add">OK</string>
+    <string name="button_text_delete">Delete</string>
+    <string name="button_text_ok">OK</string>
     <string name="content_description_calendar">Calendar</string>
     <string name="content_description_calculator">Calculator</string>
     <string name="content_description_edit_tags">Edit Tags</string>

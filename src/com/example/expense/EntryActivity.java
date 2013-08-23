@@ -32,7 +32,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     public final static String EXTRA_TRANSACTION_ID = "com.example.expense.TRANSACTION_ID";
     
     private long mTransactionId;
-    private Calendar mDate;
+    private Transaction mTransaction;
+    private Calendar mDate; // TODO: remove
     
     private ArrayAdapter<Account> mFromAccountArrayAdapter;
     private ArrayAdapter<Account> mToAccountArrayAdapter;
@@ -44,6 +45,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     private Spinner mSpinnerFromAccount;
     private Spinner mSpinnerToAccount;
     private Button mButtonDate;
+    private Button mButtonDelete;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,9 +59,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    
 	    if (isNewTransaction()) {
 	        setCurrentDate();
+	        getButtonDelete().setVisibility(View.INVISIBLE);
 	    } else {
-	        Transaction transaction = TransactionHelper.getTransaction(this, mTransactionId);
-	        populateFields(transaction);
+	        mTransaction = TransactionHelper.getTransaction(this, mTransactionId);
+	        populateFields(mTransaction);
 	    }
 	    
 	    refreshDateOnView();
@@ -97,11 +100,18 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             }
         });
         
+        getButtonDelete().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onClickButtonDelete();
+            }
+        });
+        
         Button buttonOk = (Button) findViewById(R.id.buttonOk);
         buttonOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveTransaction();
+                onClickButtonOk();
             }
         });
     }
@@ -194,15 +204,22 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
     
-    private void saveTransaction() {
+    private void onClickButtonOk() {
         if (validateInputs()) {
             if (isNewTransaction()) {
-                insertTransaction();
+                TransactionHelper.insertTransaction(this, getTransaction());
+            } else {
+                updateTransaction();
             }
             finish();
         }
     }
     
+    private void onClickButtonDelete() {
+        TransactionHelper.deleteTransactionGroup(this, mTransaction.getTransactionGroup());
+        finish();
+    }
+
     private boolean validateInputs() {
         if (getEditTextAmount().getText().length() == 0) {
             getEditTextAmount().setError(getString(R.string.error_required_amount));
@@ -211,15 +228,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         
         return true;
     }
-
-    private void insertTransaction() {
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+    
+    private void updateTransaction() {
+        // TODO
         
-        TransactionHelper transactionHelper = new TransactionHelper(database);
-        transactionHelper.insert(getTransaction());
-        
-        dbHelper.close();
     }
     
     private Transaction getTransaction() {
@@ -293,6 +305,13 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             mSpinnerToAccount = (Spinner) findViewById(R.id.spinnerToAccount);
         }
         return mSpinnerToAccount;
+    }
+    
+    private Button getButtonDelete() {
+        if (mButtonDelete == null) {
+            mButtonDelete = (Button) findViewById(R.id.buttonDelete);
+        }
+        return mButtonDelete;
     }
     
     private Button getButtonDate() {
