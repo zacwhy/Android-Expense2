@@ -21,7 +21,6 @@ public class InitialDataLoader {
 		
         initializeAccounts(database);
 		initializeExpenseCategories(database);
-		//initializePaymentMethods(database);
 		
 		dbHelper.close();
 	}
@@ -45,16 +44,6 @@ public class InitialDataLoader {
 			dataSource.createExpenseCategory(title);
 		}
 	}
-	
-//	private void initializePaymentMethods(SQLiteDatabase database) {
-//		PaymentMethodsDataSource dataSource = new PaymentMethodsDataSource(database);
-//		
-//		dataSource.deleteAll();
-//		
-//		for (String title : Values.PaymentMethods) {
-//			dataSource.insert(title);
-//		}
-//	}
 
 	private final static class Values {
         
@@ -76,21 +65,8 @@ public class InitialDataLoader {
 	        "Breakfast", "Lunch", "Dinner", "Snack",
 	        "Bus", "Train", "Bus (Work)", "Train (Work)",
 	        "Fuel", "Road", "Parking",
-	        //"I", "M", "F", "R", "Treat",
 	        "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
 	    };
-	    
-//	    public final static String[] PaymentMethods = {
-//	        "Cash",
-//	        "XtraSaver",
-//	        "BonusSaver",
-//	        "SMRT",
-//	        "Everyday",
-//	        "Ezlink",
-//	        "Kopitiam",
-//	        "I", "M", "P", "Other people",
-//	        "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
-//	    };
 	    
 	}
 	

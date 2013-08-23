@@ -12,7 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.example.expense.helpers.DateHelper;
-import com.example.expense.helpers.SqlQueryHelper;
+import com.example.expense.helpers.SqlHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -21,7 +21,7 @@ import com.example.expense.models.TransactionGroup;
 public class TransactionsDataSource {
 	
 	private static final String TABLE_NAME = 
-	        SqlQueryHelper.quote(ExpenseContract.Transaction.TABLE_NAME);
+	        SqlHelper.quote(ExpenseContract.Transaction.TABLE_NAME);
 
 	private SQLiteDatabase database;
 	
@@ -78,8 +78,7 @@ public class TransactionsDataSource {
 	public Transaction getTransaction(long id,
 	        Map<Long, Account> accounts, Map<Long, ExpenseCategory> expenseCategories // TODO remove
 	        ) {
-        String selection = SqlQueryHelper.format("%s.%s = ?", 
-                ExpenseContract.Transaction.TABLE_NAME,
+        String selection = SqlHelper.format("%s.%s = ?", ExpenseContract.Transaction.TABLE_NAME,
                 ExpenseContract.Transaction._ID);
         
         String[] selectionArgs = new String[] { Long.toString(id) };
@@ -109,7 +108,7 @@ public class TransactionsDataSource {
         
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         
-        String inTables = SqlQueryHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
+        String inTables = SqlHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
                 ExpenseContract.Transaction.TABLE_NAME,
                 ExpenseContract.TransactionGroup.TABLE_NAME,
                 ExpenseContract.Transaction.TABLE_NAME,
@@ -123,7 +122,7 @@ public class TransactionsDataSource {
         String groupBy = null;
         String having = null;
         
-        String sortOrder = SqlQueryHelper.format("%s.%s DESC, %s.%s DESC",
+        String sortOrder = SqlHelper.format("%s.%s DESC, %s.%s DESC",
                 ExpenseContract.TransactionGroup.TABLE_NAME,
                 ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
                 ExpenseContract.TransactionGroup.TABLE_NAME,

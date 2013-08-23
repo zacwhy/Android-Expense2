@@ -7,13 +7,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.expense.helpers.DateHelper;
-import com.example.expense.helpers.SqlQueryHelper;
+import com.example.expense.helpers.SqlHelper;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
 	
 	private static final String TABLE_NAME = 
-	        SqlQueryHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
+	        SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
 
 	private SQLiteDatabase database;
 	
@@ -80,7 +80,7 @@ public class TransactionGroupsDataSource {
 	private int getMaxSequence(Calendar calendar) {
 	    int sequence = 0;
 
-	    String sql = SqlQueryHelper.format("SELECT MAX(%s) FROM %s" +
+	    String sql = SqlHelper.format("SELECT MAX(%s) FROM %s" +
 	            " WHERE datetime(%s/1000, 'unixepoch') BETWEEN ? AND datetime(?, '+1 day')",
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE,
 	            ExpenseContract.TransactionGroup.TABLE_NAME,
