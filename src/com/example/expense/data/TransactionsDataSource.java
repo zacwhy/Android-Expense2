@@ -29,24 +29,17 @@ public class TransactionsDataSource {
 		this.database = database;
 	}
 	
-	public long insertIncludeParent(Transaction transaction) {
-	    // Insert parent first
-	    TransactionGroup transactionGroup = transaction.getTransactionGroup();
-	    TransactionGroupsDataSource transactionGroupsDataSource = 
-	            new TransactionGroupsDataSource(database);
-	    long transactionGroupId = transactionGroupsDataSource.insertAtEnd(transactionGroup);
-
-	    // Update newly created Transaction Group ID
-	    transactionGroup.setId(transactionGroupId);
-	    
-	    return insert(transaction);
-	}
+	public void insert(List<Transaction> transactions, long transactionGroupId) {
+        for (Transaction transaction : transactions) {
+            simpleInsert(transaction, transactionGroupId);
+        }
+    }
 	
-	private long insert(Transaction transaction) {
+	private long simpleInsert(Transaction transaction, long transactionGroupId) {
 		ContentValues values = new ContentValues();
 		
 		values.put(ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID, 
-		        transaction.getTransactionGroup().getId());
+		        transactionGroupId);
 		values.put(ExpenseContract.Transaction.COLUMN_NAME_SEQUENCE, transaction.getSequence());
 		values.put(ExpenseContract.Transaction.COLUMN_NAME_FROM_ACCOUNT_ID,
 		        transaction.getFromAccount().getId());

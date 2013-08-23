@@ -44,6 +44,15 @@ public final class DateHelper {
     //
     //
     
+    public static Calendar getCurrentDateOnly() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar;
+    }
+    
     public static Calendar getCalendarFromMilliseconds(long millis) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(millis);

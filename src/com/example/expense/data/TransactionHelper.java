@@ -15,27 +15,35 @@ public final class TransactionHelper {
     
     private TransactionHelper() {}
     
-    // TODO change to insertTransactionGroup
-    public static void insertTransaction(Context context, Transaction transaction) {
+    public static void insertTransactionGroup(Context context, TransactionGroup transactionGroup) {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
         
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         
-        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-        transactionsDataSource.insertIncludeParent(transaction);
+        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+        dataSource.insertLast(transactionGroup);
         
         dbHelper.close();
     }
+    
+//    public static void updateTransactionGroup(Context context, long id, ContentValues values) {
+//        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
+//        
+//        SQLiteDatabase database = dbHelper.getWritableDatabase();
+//        
+//        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+//        dataSource.updateById(id, values);
+//        
+//        dbHelper.close();
+//    }
     
     public static void deleteTransactionGroup(Context context, TransactionGroup transactionGroup) {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
         
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         
-        TransactionGroupsDataSource transactionGroupsDataSource = 
-                new TransactionGroupsDataSource(database);
-        
-        transactionGroupsDataSource.deleteByTransactionGroup(transactionGroup);
+        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+        dataSource.deleteByTransactionGroup(transactionGroup);
         
         dbHelper.close();
     }
@@ -48,9 +56,8 @@ public final class TransactionHelper {
         Map<Long, Account> accounts = Helper.getAccountsMap(database);
         Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
         
-        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-        Transaction transaction = transactionsDataSource.getTransaction(id, accounts, 
-                expenseCategories);
+        TransactionsDataSource dataSource = new TransactionsDataSource(database);
+        Transaction transaction = dataSource.getTransaction(id, accounts, expenseCategories);
 
         dbHelper.close();
 
@@ -65,9 +72,8 @@ public final class TransactionHelper {
         Map<Long, Account> accounts = Helper.getAccountsMap(database);
         Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
 
-        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-        List<Transaction> transactions = transactionsDataSource.getTransactions(accounts, 
-                expenseCategories);
+        TransactionsDataSource dataSource = new TransactionsDataSource(database);
+        List<Transaction> transactions = dataSource.getTransactions(accounts, expenseCategories);
 
         dbHelper.close();
 

@@ -1,6 +1,8 @@
 package com.example.expense.models;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 public class TransactionGroup {
 
@@ -8,6 +10,11 @@ public class TransactionGroup {
     private Calendar date;
     private int sequence;
     private ExpenseCategory expenseCategory;
+    private List<Transaction> transactions;
+    
+    public TransactionGroup() {
+        transactions = new ArrayList<Transaction>();
+    }
     
     public long getId() {
         return id;
@@ -39,6 +46,10 @@ public class TransactionGroup {
 
     public void setExpenseCategory(ExpenseCategory expenseCategory) {
         this.expenseCategory = expenseCategory;
+    }
+    
+    public List<Transaction> getTransactions() {
+        return transactions;
     }
 
 }

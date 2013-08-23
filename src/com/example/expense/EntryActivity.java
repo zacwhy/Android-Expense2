@@ -35,6 +35,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     public final static String ACTION_DELETE = "delete";
     
+    private TransactionGroup mTransactionGroup;
     private long mTransactionId;
     private Transaction mTransaction;
     private Calendar mDate; // TODO: remove
@@ -62,6 +63,9 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    mTransactionId = getIntent().getLongExtra(EXTRA_TRANSACTION_ID, 0);
 	    
 	    if (isNewTransaction()) {
+	        mTransactionGroup = new TransactionGroup();
+	        mTransactionGroup.setDate(DateHelper.getCurrentDateOnly());
+	        
 	        setCurrentDate();
 	        getButtonDelete().setVisibility(View.INVISIBLE);
 	    } else {
@@ -211,9 +215,9 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     private void onClickButtonOk() {
         if (validateInputs()) {
             if (isNewTransaction()) {
-                TransactionHelper.insertTransaction(this, getTransaction());
+                TransactionHelper.insertTransactionGroup(this, getInputTransactionGroup());
             } else {
-                updateTransaction();
+                // update
             }
             finish();
         }
@@ -233,49 +237,28 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             getEditTextAmount().setError(getString(R.string.error_required_amount));
             return false;
         }
-        
         return true;
     }
     
-    private void updateTransaction() {
-
-    }
-    
-    private Transaction getTransaction() {
-        Transaction transaction = new Transaction();
-        
-        transaction.setTransactionGroup(getTransactionGroup());
-        
-        int sequence = 1; // TODO
-        transaction.setSequence(sequence);
-        
-        Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
-        transaction.setFromAccount(fromAccount);
-        
-        Account toAccount = (Account) getSpinnerToAccount().getSelectedItem();
-        transaction.setToAccount(toAccount);
-        
-        // amount
-        BigDecimal amount = new BigDecimal(getEditTextAmount().getText().toString());
-        transaction.setAmount(amount);
-        
-        // description
-        String description = getAutoCompleteTextViewDescription().getText().toString();
-        transaction.setDescription(description);
-        
-        return transaction;
-    }
-    
-    private TransactionGroup getTransactionGroup() {
-        TransactionGroup transactionGroup = new TransactionGroup();
-        
-        transactionGroup.setDate(mDate);
-        
+    private TransactionGroup getInputTransactionGroup() {
         ExpenseCategory expenseCategory = 
                 (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
-        transactionGroup.setExpenseCategory(expenseCategory);
+        Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
+        Account toAccount = (Account) getSpinnerToAccount().getSelectedItem();
+        BigDecimal amount = new BigDecimal(getEditTextAmount().getText().toString());
+        String description = getAutoCompleteTextViewDescription().getText().toString();
         
-        return transactionGroup;
+        Transaction transaction = new Transaction();
+        transaction.setSequence(1);
+        transaction.setFromAccount(fromAccount);
+        transaction.setToAccount(toAccount);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+        
+        mTransactionGroup.setExpenseCategory(expenseCategory);
+        mTransactionGroup.getTransactions().add(transaction);
+        
+        return mTransactionGroup;
     }
     
     private AutoCompleteTextView getAutoCompleteTextViewDescription() {

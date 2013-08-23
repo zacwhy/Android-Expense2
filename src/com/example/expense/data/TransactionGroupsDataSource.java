@@ -21,13 +21,19 @@ public class TransactionGroupsDataSource {
 		this.database = database;
 	}
 	
-	public long insertAtEnd(TransactionGroup transactionGroup) {
+	public long insertLast(TransactionGroup transactionGroup) {
         int sequence = getMaxSequence(transactionGroup.getDate()) + 1;
         transactionGroup.setSequence(sequence);
-        return insert(transactionGroup);
+        
+        long transactionGroupId = simpleInsert(transactionGroup);
+        
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
+        transactionsDataSource.insert(transactionGroup.getTransactions(), transactionGroupId);
+        
+        return transactionGroupId;
 	}
 	
-	private long insert(TransactionGroup transactionGroup) {
+	private long simpleInsert(TransactionGroup transactionGroup) {
 		ContentValues values = new ContentValues();
 		
 		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
@@ -39,6 +45,17 @@ public class TransactionGroupsDataSource {
 
 		long newRowId = database.insert(TABLE_NAME, null, values);
 		return newRowId;
+	}
+	
+	public int updateById(long id, ContentValues values) {
+	    String whereClause = ExpenseContract.TransactionGroup._ID + " = ?";
+	    String[] whereArgs = new String[] { Long.toString(id) };
+	    return update(values, whereClause, whereArgs);
+	}
+	
+	private int update(ContentValues values, String whereClause, String[] whereArgs) {
+	    int rowsAffected = database.update(TABLE_NAME, values, whereClause, whereArgs);
+	    return rowsAffected;
 	}
 	
 	public int deleteByTransactionGroup(TransactionGroup transactionGroup) {
