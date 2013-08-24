@@ -1,6 +1,8 @@
 package com.example.expense.data;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -8,6 +10,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.SqlHelper;
+import com.example.expense.models.ExpenseCategory;
+import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
@@ -75,6 +79,78 @@ public class TransactionGroupsDataSource {
 	private int delete(String whereClause, String[] whereArgs) {
 	    int rowsAffected = database.delete(TABLE_NAME, whereClause, whereArgs);
         return rowsAffected;
+	}
+	
+	public TransactionGroup getTransactionGroupWithTransactionsById(long id) {
+	    TransactionGroup transactionGroup = getTransactionGroupById(id);
+	    
+	    TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
+	    List<Transaction> transactions = 
+	            transactionsDataSource.getTransactionsByTransactionGroupId(id);
+	    
+	    transactionGroup.setTransactions(transactions);
+	    
+	    return transactionGroup;
+	}
+	
+	public TransactionGroup getTransactionGroupById(long id) {
+        String selection = ExpenseContract.TransactionGroup._ID + " = ?";
+        String[] selectionArgs = { Long.toString(id) };
+        
+        List<TransactionGroup> items = get(selection, selectionArgs);
+        
+        if (items.size() == 0) {
+            return null;
+        }
+        
+        return items.get(0);
+	}
+	
+	private List<TransactionGroup> get(String selection, String[] selectionArgs) {
+	    String[] columns = {
+	            ExpenseContract.TransactionGroup._ID,
+	            ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
+	            ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE,
+	            ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID
+	    };
+	    
+	    String groupBy = null;
+	    String having = null;
+	    String orderBy = null;
+
+	    Cursor cursor = database.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, 
+	            having, orderBy);
+	    
+	    List<TransactionGroup> items = new ArrayList<TransactionGroup>();
+	    
+	    cursor.moveToFirst();
+	    while (!cursor.isAfterLast()) {
+	        TransactionGroup item = cursorToTransactionGroup(cursor);
+	        items.add(item);
+	        cursor.moveToNext();
+	    }
+	    
+	    // Make sure to close the cursor
+	    cursor.close();
+	    return items;
+	}
+	
+	private TransactionGroup cursorToTransactionGroup(Cursor cursor) {
+	    long id = cursor.getLong(0);
+	    Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(1));
+	    int sequence = cursor.getInt(2);
+	    long expenseCategoryId = cursor.getLong(3);
+	    
+	    ExpenseCategory expenseCategory = new ExpenseCategory();
+	    expenseCategory.setId(expenseCategoryId);
+	    
+	    TransactionGroup transactionGroup = new TransactionGroup();
+	    transactionGroup.setId(id);
+	    transactionGroup.setDate(date);
+	    transactionGroup.setSequence(sequence);
+	    transactionGroup.setExpenseCategory(expenseCategory);
+	    
+	    return transactionGroup;
 	}
 	
 	private int getMaxSequence(Calendar calendar) {

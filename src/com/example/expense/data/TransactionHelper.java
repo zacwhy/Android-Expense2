@@ -26,17 +26,6 @@ public final class TransactionHelper {
         dbHelper.close();
     }
     
-//    public static void updateTransactionGroup(Context context, long id, ContentValues values) {
-//        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
-//        
-//        SQLiteDatabase database = dbHelper.getWritableDatabase();
-//        
-//        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
-//        dataSource.updateById(id, values);
-//        
-//        dbHelper.close();
-//    }
-    
     public static void deleteTransactionGroup(Context context, TransactionGroup transactionGroup) {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
         
@@ -46,22 +35,6 @@ public final class TransactionHelper {
         dataSource.deleteByTransactionGroup(transactionGroup);
         
         dbHelper.close();
-    }
-    
-    public static Transaction getTransaction(Context context, long id) {
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
-
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
-        
-        Map<Long, Account> accounts = Helper.getAccountsMap(database);
-        Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
-        
-        TransactionsDataSource dataSource = new TransactionsDataSource(database);
-        Transaction transaction = dataSource.getTransaction(id, accounts, expenseCategories);
-
-        dbHelper.close();
-
-        return transaction;
     }
     
     public static List<Transaction> getTransactions(Context context) {
@@ -78,6 +51,30 @@ public final class TransactionHelper {
         dbHelper.close();
 
         return transactions;
+    }
+
+    public static void populateTransactionGroupChildren(TransactionGroup transactionGroup,
+            Map<Long, Account> accounts, Map<Long, ExpenseCategory> expenseCategories) {
+        
+        long expenseCategoryId = transactionGroup.getExpenseCategory().getId();
+        ExpenseCategory expenseCategory = expenseCategories.get(expenseCategoryId);
+        transactionGroup.setExpenseCategory(expenseCategory);
+        
+        for (Transaction transaction : transactionGroup.getTransactions()) {
+            populateTransactionChildren(transaction, accounts);
+        }
+    }
+    
+    private static void populateTransactionChildren(Transaction transaction,
+            Map<Long, Account> accounts) {
+        
+        long fromAccountId = transaction.getFromAccount().getId();
+        Account fromAccount = accounts.get(fromAccountId);
+        transaction.setFromAccount(fromAccount);
+        
+        long toAccountId = transaction.getToAccount().getId();
+        Account toAccount = accounts.get(toAccountId);
+        transaction.setToAccount(toAccount);
     }
 
 }

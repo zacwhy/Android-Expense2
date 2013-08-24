@@ -65,7 +65,7 @@ public class SummaryActivity extends ListActivity {
 	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
-	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_ID, listItem.getId());
+	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_GROUP_ID, listItem.getId());
 	    startActivityForResult(intent, 0);
     }
 	
@@ -94,7 +94,7 @@ public class SummaryActivity extends ListActivity {
 	    List<SummaryListItem> list = new ArrayList<SummaryListItem>();
         
         for (Transaction transaction : transactions) {
-            long id = transaction.getId();
+            long id = transaction.getTransactionGroup().getId();
             String label = getLabel(transaction);
             BigDecimal amount = transaction.getAmount();
             SummaryListItem summaryListItem = new SummaryListItem(id, label, amount, 0);

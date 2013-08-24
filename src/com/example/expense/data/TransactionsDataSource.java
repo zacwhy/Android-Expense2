@@ -75,25 +75,75 @@ public class TransactionsDataSource {
         return rowsAffected;
 	}
 	
-	public Transaction getTransaction(long id,
-	        Map<Long, Account> accounts, Map<Long, ExpenseCategory> expenseCategories // TODO remove
-	        ) {
-        String selection = SqlHelper.format("%s.%s = ?", ExpenseContract.Transaction.TABLE_NAME,
-                ExpenseContract.Transaction._ID);
+	public List<Transaction> getTransactionsByTransactionGroupId(long transactionGroupId) {
+        String selection = ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID + " = ?";
+        String[] selectionArgs = { Long.toString(transactionGroupId) };
         
-        String[] selectionArgs = new String[] { Long.toString(id) };
+        return get(selection, selectionArgs);    
+	}
+	
+	private List<Transaction> get(String selection, String[] selectionArgs) {
+	    
+	    String[] columns = {
+	            ExpenseContract.Transaction._ID,
+                ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID,
+	            ExpenseContract.Transaction.COLUMN_NAME_SEQUENCE,
+                ExpenseContract.Transaction.COLUMN_NAME_FROM_ACCOUNT_ID,
+                ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID,
+                ExpenseContract.Transaction.COLUMN_NAME_AMOUNT,
+	            ExpenseContract.Transaction.COLUMN_NAME_DESCRIPTION
+	    };
+	    
+	    String groupBy = null;
+	    String having = null;
+	    String orderBy = null;
+	    
+	    Cursor cursor = database.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, 
+	            having, orderBy);
+	    
+	    List<Transaction> items = new ArrayList<Transaction>();
+
+	    cursor.moveToFirst();
+	    while (!cursor.isAfterLast()) {
+	        Transaction item = cursorToTransaction(cursor);
+	        items.add(item);
+	        cursor.moveToNext();
+	    }
+
+	    // Make sure to close the cursor
+	    cursor.close();
+	    return items;
+	}
+	
+	private Transaction cursorToTransaction(Cursor cursor) {
+	    long id = cursor.getLong(0);
+        long transactionGroupId = cursor.getLong(1);
+        int sequence = cursor.getInt(2);
+        long fromAccountId = cursor.getLong(3);
+        long toAccountId = cursor.getLong(4);
+        BigDecimal amount = new BigDecimal(cursor.getString(5));
+        String description = cursor.getString(6);
         
-        List<Transaction> transactions = getTransactionsWithParameters(selection, selectionArgs, 
-                accounts, expenseCategories);
+        TransactionGroup transactionGroup = new TransactionGroup();
+        transactionGroup.setId(transactionGroupId);
         
-        if (transactions.size() == 0) {
-            return null;
-        }
+        Account fromAccount = new Account();
+        fromAccount.setId(fromAccountId);
         
-        Transaction transaction = transactions.get(0);
-        
+        Account toAccount = new Account();
+        toAccount.setId(toAccountId);
+
+        Transaction transaction = new Transaction();
+        transaction.setId(id);
+        transaction.setTransactionGroup(transactionGroup);
+        transaction.setSequence(sequence);
+        transaction.setFromAccount(fromAccount);
+        transaction.setToAccount(toAccount);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+
         return transaction;
-    }
+	}
 	
 	public List<Transaction> getTransactions(Map<Long, Account> accounts, 
             Map<Long, ExpenseCategory> expenseCategories) {

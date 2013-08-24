@@ -14,7 +14,7 @@ public final class Helper {
     private Helper() {}
     
     public static Map<Long, Account> getAccountsMap(SQLiteDatabase database) {
-        List<Account> list = Helper.getAccounts(database);
+        List<Account> list = getAccounts(database);
         return convertToAccountsMap(list);
     }
     
@@ -23,13 +23,8 @@ public final class Helper {
         return dataSource.getAll();
     }
     
-//    public static List<PaymentMethod> getPaymentMethods(SQLiteDatabase database) {
-//        PaymentMethodsDataSource dataSource = new PaymentMethodsDataSource(database);
-//        return dataSource.getAll();
-//    }
-    
     public static Map<Long, ExpenseCategory> getExpenseCategoriesMap(SQLiteDatabase database) {
-        List<ExpenseCategory> list = Helper.getExpenseCategories(database);
+        List<ExpenseCategory> list = getExpenseCategories(database);
         return convertToExpenseCategoriesMap(list);
     }
     
@@ -38,7 +33,7 @@ public final class Helper {
         return dataSource.getAll();
     }
     
-    private static Map<Long, Account> convertToAccountsMap(List<Account> list) {
+    public static Map<Long, Account> convertToAccountsMap(List<Account> list) {
         Map<Long, Account> map = new HashMap<Long, Account>();
         
         for (Account item : list) {
@@ -48,7 +43,7 @@ public final class Helper {
         return map;
     }
     
-    private static Map<Long, ExpenseCategory> convertToExpenseCategoriesMap(List<ExpenseCategory> list) {
+    public static Map<Long, ExpenseCategory> convertToExpenseCategoriesMap(List<ExpenseCategory> list) {
         Map<Long, ExpenseCategory> map = new HashMap<Long, ExpenseCategory>();
         
         for (ExpenseCategory item : list) {
