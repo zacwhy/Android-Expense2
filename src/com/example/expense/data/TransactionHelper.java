@@ -26,13 +26,13 @@ public final class TransactionHelper {
         dbHelper.close();
     }
     
-    public static void deleteTransactionGroup(Context context, TransactionGroup transactionGroup) {
+    public static void deleteTransactionGroup(Context context, long id) {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
         
         SQLiteDatabase database = dbHelper.getWritableDatabase();
         
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
-        dataSource.deleteByTransactionGroup(transactionGroup);
+        dataSource.deleteByTransactionGroupId(id);
         
         dbHelper.close();
     }

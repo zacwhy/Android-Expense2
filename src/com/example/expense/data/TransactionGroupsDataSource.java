@@ -62,10 +62,6 @@ public class TransactionGroupsDataSource {
 	    return rowsAffected;
 	}
 	
-	public int deleteByTransactionGroup(TransactionGroup transactionGroup) {
-        return deleteByTransactionGroupId(transactionGroup.getId());
-	}
-	
 	public int deleteByTransactionGroupId(long transactionGroupId) {
 	    // Delete child records first
         TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);

@@ -235,7 +235,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     private void onClickButtonDelete() {
-        TransactionHelper.deleteTransactionGroup(this, mTransactionGroup); // TODO by Id
+        TransactionHelper.deleteTransactionGroup(this, mTransactionGroup.getId());
         
         Intent intent = new Intent();
         intent.putExtra(EXTRA_ACTION, ACTION_DELETE);
