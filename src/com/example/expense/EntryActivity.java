@@ -21,10 +21,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.expense.data.ExpenseDbHelper;
-import com.example.expense.data.Helper;
 import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.data.TransactionHelper;
 import com.example.expense.helpers.DateHelper;
+import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -182,14 +182,14 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	}
 
     private void populateFields(TransactionGroup transactionGroup) {
+        setSpinnerExpenseCategorySelection(transactionGroup.getExpenseCategory());
+        setSpinnerFromAccountSelection(transactionGroup.getFromAccount());
+
         Transaction transaction = transactionGroup.getTransactions().get(0);
         
-        getAutoCompleteTextViewDescription().setText(transaction.getDescription());
-        getEditTextAmount().setText(transaction.getAmount().toPlainString());
-        
-        setSpinnerFromAccountSelection(transaction.getFromAccount());
         setSpinnerToAccountSelection(transaction.getToAccount());
-        setSpinnerExpenseCategorySelection(transactionGroup.getExpenseCategory());
+        getEditTextAmount().setText(transaction.getAmount().toPlainString());
+        getAutoCompleteTextViewDescription().setText(transaction.getDescription());
     }
     
     private void setSpinnerFromAccountSelection(Account fromAccount) {
@@ -256,18 +256,20 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
                 (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
         
         Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
+        
+        mTransactionGroup.setExpenseCategory(expenseCategory);
+        mTransactionGroup.setFromAccount(fromAccount);
+        
         Account toAccount = (Account) getSpinnerToAccount().getSelectedItem();
         BigDecimal amount = new BigDecimal(getEditTextAmount().getText().toString());
         String description = getAutoCompleteTextViewDescription().getText().toString();
         
         Transaction transaction = new Transaction();
         transaction.setSequence(1);
-        transaction.setFromAccount(fromAccount);
         transaction.setToAccount(toAccount);
         transaction.setAmount(amount);
         transaction.setDescription(description);
         
-        mTransactionGroup.setExpenseCategory(expenseCategory);
         mTransactionGroup.getTransactions().add(transaction);
         
         return mTransactionGroup;

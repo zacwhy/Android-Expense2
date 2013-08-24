@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.SqlHelper;
+import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
@@ -46,6 +47,8 @@ public class TransactionGroupsDataSource {
 		        transactionGroup.getSequence());
 		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, 
 		        transactionGroup.getExpenseCategory().getId());
+        values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, 
+                transactionGroup.getFromAccount().getId());
 
 		long newRowId = database.insert(TABLE_NAME, null, values);
 		return newRowId;
@@ -107,7 +110,8 @@ public class TransactionGroupsDataSource {
 	            ExpenseContract.TransactionGroup._ID,
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE,
-	            ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID
+	            ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID,
+	            ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID
 	    };
 	    
 	    String groupBy = null;
@@ -136,15 +140,20 @@ public class TransactionGroupsDataSource {
 	    Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(1));
 	    int sequence = cursor.getInt(2);
 	    long expenseCategoryId = cursor.getLong(3);
+	    long fromAccountId = cursor.getLong(4);
 	    
 	    ExpenseCategory expenseCategory = new ExpenseCategory();
 	    expenseCategory.setId(expenseCategoryId);
+	    
+	    Account fromAccount = new Account();
+	    fromAccount.setId(fromAccountId);
 	    
 	    TransactionGroup transactionGroup = new TransactionGroup();
 	    transactionGroup.setId(id);
 	    transactionGroup.setDate(date);
 	    transactionGroup.setSequence(sequence);
 	    transactionGroup.setExpenseCategory(expenseCategory);
+	    transactionGroup.setFromAccount(fromAccount);
 	    
 	    return transactionGroup;
 	}

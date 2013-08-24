@@ -41,8 +41,6 @@ public class TransactionsDataSource {
 		values.put(ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID, 
 		        transactionGroupId);
 		values.put(ExpenseContract.Transaction.COLUMN_NAME_SEQUENCE, transaction.getSequence());
-		values.put(ExpenseContract.Transaction.COLUMN_NAME_FROM_ACCOUNT_ID,
-		        transaction.getFromAccount().getId());
         values.put(ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID, 
                 transaction.getToAccount().getId());
         values.put(ExpenseContract.Transaction.COLUMN_NAME_AMOUNT, 
@@ -88,7 +86,6 @@ public class TransactionsDataSource {
 	            ExpenseContract.Transaction._ID,
                 ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID,
 	            ExpenseContract.Transaction.COLUMN_NAME_SEQUENCE,
-                ExpenseContract.Transaction.COLUMN_NAME_FROM_ACCOUNT_ID,
                 ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID,
                 ExpenseContract.Transaction.COLUMN_NAME_AMOUNT,
 	            ExpenseContract.Transaction.COLUMN_NAME_DESCRIPTION
@@ -119,16 +116,12 @@ public class TransactionsDataSource {
 	    long id = cursor.getLong(0);
         long transactionGroupId = cursor.getLong(1);
         int sequence = cursor.getInt(2);
-        long fromAccountId = cursor.getLong(3);
-        long toAccountId = cursor.getLong(4);
-        BigDecimal amount = new BigDecimal(cursor.getString(5));
-        String description = cursor.getString(6);
+        long toAccountId = cursor.getLong(3);
+        BigDecimal amount = new BigDecimal(cursor.getString(4));
+        String description = cursor.getString(5);
         
         TransactionGroup transactionGroup = new TransactionGroup();
         transactionGroup.setId(transactionGroupId);
-        
-        Account fromAccount = new Account();
-        fromAccount.setId(fromAccountId);
         
         Account toAccount = new Account();
         toAccount.setId(toAccountId);
@@ -137,7 +130,6 @@ public class TransactionsDataSource {
         transaction.setId(id);
         transaction.setTransactionGroup(transactionGroup);
         transaction.setSequence(sequence);
-        transaction.setFromAccount(fromAccount);
         transaction.setToAccount(toAccount);
         transaction.setAmount(amount);
         transaction.setDescription(description);
@@ -202,7 +194,7 @@ public class TransactionsDataSource {
         long transactionId = cursor.getLong(0);
         long transactionGroupId = cursor.getLong(1);
         int transactionSequence = cursor.getInt(2);
-        long fromAccountId = cursor.getLong(3);
+        //long fromAccountId = cursor.getLong(3);
         long toAccountId = cursor.getLong(4);
         BigDecimal amount = new BigDecimal(cursor.getString(5));
         String description = cursor.getString(6);
@@ -212,7 +204,7 @@ public class TransactionsDataSource {
         long expenseCategoryId = cursor.getLong(10);
         
         ExpenseCategory expenseCategory = expenseCategories.get(expenseCategoryId);
-        Account fromAccount = accounts.get(fromAccountId);
+        //Account fromAccount = accounts.get(fromAccountId);
         Account toAccount = accounts.get(toAccountId);
 
         TransactionGroup transactionGroup = new TransactionGroup();
@@ -225,7 +217,7 @@ public class TransactionsDataSource {
         transaction.setId(transactionId);
         transaction.setTransactionGroup(transactionGroup);
         transaction.setSequence(transactionSequence);
-        transaction.setFromAccount(fromAccount);
+        //transaction.setFromAccount(fromAccount);
         transaction.setToAccount(toAccount);
         transaction.setAmount(amount);
         transaction.setDescription(description);

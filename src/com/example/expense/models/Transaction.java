@@ -7,7 +7,6 @@ public class Transaction {
     private long id;
     private TransactionGroup transactionGroup;
     private int sequence;
-    private Account fromAccount;
     private Account toAccount;
     private BigDecimal amount;
     private String description;
@@ -34,14 +33,6 @@ public class Transaction {
 
     public void setSequence(int sequence) {
         this.sequence = sequence;
-    }
-
-    public Account getFromAccount() {
-        return fromAccount;
-    }
-
-    public void setFromAccount(Account fromAccount) {
-        this.fromAccount = fromAccount;
     }
 
     public Account getToAccount() {

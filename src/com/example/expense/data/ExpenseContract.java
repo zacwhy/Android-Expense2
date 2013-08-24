@@ -36,13 +36,13 @@ public final class ExpenseContract {
         public static final String COLUMN_NAME_DATE = "date";
         public static final String COLUMN_NAME_SEQUENCE = "sequence";
         public static final String COLUMN_NAME_EXPENSE_CATEGORY_ID = "expense_category_id";
+        public static final String COLUMN_NAME_FROM_ACCOUNT_ID = "from_account_id";
     }
 
     public static abstract class Transaction implements BaseColumns {
         public static final String TABLE_NAME = "transaction";
         public static final String COLUMN_NAME_TRANSACTION_GROUP_ID = "transaction_group_id";
         public static final String COLUMN_NAME_SEQUENCE = "sequence";
-        public static final String COLUMN_NAME_FROM_ACCOUNT_ID = "from_account_id";
         public static final String COLUMN_NAME_TO_ACCOUNT_ID = "to_account_id";
         public static final String COLUMN_NAME_AMOUNT = "amount";
         public static final String COLUMN_NAME_DESCRIPTION = "description";

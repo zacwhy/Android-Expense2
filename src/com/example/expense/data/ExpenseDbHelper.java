@@ -29,68 +29,51 @@ public class ExpenseDbHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// This database is only a cache for online data, so its upgrade policy is
-		// to simply to discard the data and start over
-	    
-//	    db.execSQL(SQL_DELETE_ACCOUNTS);
-//		db.execSQL(SQL_DELETE_EXPENSE_CATEGORIES);
-//		db.execSQL(SQL_DELETE_TRANSACTION_GROUPS);
-//        db.execSQL(SQL_DELETE_TRANSACTIONS);
-
-	    //		onCreate(db);
-	    
-	    
+	    if (oldVersion < 11) {
+	        // upgrade from 10 to 11
+	    }
 	}
 	
 	public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 	
+    private static final String CREATE_TABLE = "CREATE TABLE ";
+    private static final String INTEGER_PRIMARY_KEY = " INTEGER PRIMARY KEY";
+    private static final String COMMA_SEP = ",";
+	private static final String INTEGER_TYPE = " INTEGER";
+	private static final String REAL_TYPE = " REAL";
 	private static final String TEXT_TYPE = " TEXT";
-	private static final String COMMA_SEP = ",";
-	//private static final String DROP_TABLE_IF_EXISTS = "DROP TABLE IF EXISTS ";
 	
     private static final String SQL_CREATE_ACCOUNTS =
-            "CREATE TABLE " + Account.TABLE_NAME + " (" +
+            CREATE_TABLE + Account.TABLE_NAME + " (" +
                     Account._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
                     Account.COLUMN_NAME_NAME + TEXT_TYPE +
                     ")";
-
-//    private static final String SQL_DELETE_ACCOUNTS =
-//            "DROP TABLE IF EXISTS " + Account.TABLE_NAME;
     
 	private static final String SQL_CREATE_EXPENSE_CATEGORIES =
-			"CREATE TABLE " + ExpenseCategory.TABLE_NAME + " (" +
-					ExpenseCategory._ID + " INTEGER PRIMARY KEY" + COMMA_SEP +
-					ExpenseCategory.COLUMN_NAME_TITLE + TEXT_TYPE +
+	        CREATE_TABLE + ExpenseCategory.TABLE_NAME + " (" +
+					ExpenseCategory._ID + INTEGER_PRIMARY_KEY + 
+					COMMA_SEP + ExpenseCategory.COLUMN_NAME_TITLE + TEXT_TYPE +
 					")";
-
-//	private static final String SQL_DELETE_EXPENSE_CATEGORIES =
-//			"DROP TABLE IF EXISTS " + ExpenseCategory.TABLE_NAME;
     
     private static final String SQL_CREATE_TRANSACTION_GROUPS =
-            "CREATE TABLE " + TransactionGroup.TABLE_NAME + " (" +
-                    TransactionGroup._ID + " INTEGER PRIMARY KEY" + 
-                    COMMA_SEP + TransactionGroup.COLUMN_NAME_DATE + " INTEGER" + 
-                    COMMA_SEP + TransactionGroup.COLUMN_NAME_SEQUENCE + " INTEGER" + 
-                    COMMA_SEP + TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID + " INTEGER" + 
+            CREATE_TABLE + TransactionGroup.TABLE_NAME + " (" +
+                    TransactionGroup._ID + INTEGER_PRIMARY_KEY + 
+                    COMMA_SEP + TransactionGroup.COLUMN_NAME_DATE + INTEGER_TYPE + 
+                    COMMA_SEP + TransactionGroup.COLUMN_NAME_SEQUENCE + INTEGER_TYPE + 
+                    COMMA_SEP + TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID + INTEGER_TYPE + 
+                    COMMA_SEP + TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID + INTEGER_TYPE + 
                     ")";
-
-//    private static final String SQL_DELETE_TRANSACTION_GROUPS = 
-//            DROP_TABLE_IF_EXISTS + TransactionGroup.TABLE_NAME;
     
     private static final String SQL_CREATE_TRANSACTIONS =
-            "CREATE TABLE \"" + Transaction.TABLE_NAME + "\" (" +
-                    Transaction._ID + " INTEGER PRIMARY KEY" + 
-                    COMMA_SEP + Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID + " INTEGER" + 
-                    COMMA_SEP + Transaction.COLUMN_NAME_SEQUENCE + " INTEGER" + 
-                    COMMA_SEP + Transaction.COLUMN_NAME_FROM_ACCOUNT_ID + " INTEGER" + 
-                    COMMA_SEP + Transaction.COLUMN_NAME_TO_ACCOUNT_ID + " INTEGER" + 
-                    COMMA_SEP + Transaction.COLUMN_NAME_AMOUNT + " REAL" + 
+            CREATE_TABLE + "\"" + Transaction.TABLE_NAME + "\" (" +
+                    Transaction._ID + INTEGER_PRIMARY_KEY + 
+                    COMMA_SEP + Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID + INTEGER_TYPE + 
+                    COMMA_SEP + Transaction.COLUMN_NAME_SEQUENCE + INTEGER_TYPE + 
+                    COMMA_SEP + Transaction.COLUMN_NAME_TO_ACCOUNT_ID + INTEGER_TYPE + 
+                    COMMA_SEP + Transaction.COLUMN_NAME_AMOUNT + REAL_TYPE + 
                     COMMA_SEP + Transaction.COLUMN_NAME_DESCRIPTION + TEXT_TYPE + 
                     ")";
-
-//    private static final String SQL_DELETE_TRANSACTIONS = 
-//            DROP_TABLE_IF_EXISTS + "\"" + Transaction.TABLE_NAME + "\"";
 
 }

@@ -6,6 +6,7 @@ import java.util.Map;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -60,6 +61,10 @@ public final class TransactionHelper {
         ExpenseCategory expenseCategory = expenseCategories.get(expenseCategoryId);
         transactionGroup.setExpenseCategory(expenseCategory);
         
+        long fromAccountId = transactionGroup.getFromAccount().getId();
+        Account fromAccount = accounts.get(fromAccountId);
+        transactionGroup.setFromAccount(fromAccount);
+        
         for (Transaction transaction : transactionGroup.getTransactions()) {
             populateTransactionChildren(transaction, accounts);
         }
@@ -67,10 +72,6 @@ public final class TransactionHelper {
     
     private static void populateTransactionChildren(Transaction transaction,
             Map<Long, Account> accounts) {
-        
-        long fromAccountId = transaction.getFromAccount().getId();
-        Account fromAccount = accounts.get(fromAccountId);
-        transaction.setFromAccount(fromAccount);
         
         long toAccountId = transaction.getToAccount().getId();
         Account toAccount = accounts.get(toAccountId);

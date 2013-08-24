@@ -10,6 +10,7 @@ public class TransactionGroup {
     private Calendar date;
     private int sequence;
     private ExpenseCategory expenseCategory;
+    private Account fromAccount;
     private List<Transaction> transactions;
     
     public TransactionGroup() {
@@ -46,6 +47,14 @@ public class TransactionGroup {
 
     public void setExpenseCategory(ExpenseCategory expenseCategory) {
         this.expenseCategory = expenseCategory;
+    }
+    
+    public Account getFromAccount() {
+        return fromAccount;
+    }
+
+    public void setFromAccount(Account fromAccount) {
+        this.fromAccount = fromAccount;
     }
     
     public List<Transaction> getTransactions() {
