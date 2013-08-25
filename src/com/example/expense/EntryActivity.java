@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.DatePickerDialog.OnDateSetListener;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.expense.data.ExpenseContract;
 import com.example.expense.data.ExpenseDbHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.data.TransactionHelper;
@@ -228,12 +230,12 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             if (isNew()) {
                 TransactionHelper.insertTransactionGroup(this, getInputTransactionGroup());
             } else {
-                // update
+                update(mTransactionGroup);
             }
             finish();
         }
     }
-    
+
     private void onClickButtonDelete() {
         TransactionHelper.deleteTransactionGroup(this, mTransactionGroup.getId());
         
@@ -249,6 +251,36 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
             return false;
         }
         return true;
+    }
+    
+    private void update(TransactionGroup transactionGroup) {
+        ExpenseCategory expenseCategory = 
+                (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
+        Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
+        
+        ContentValues values = new ContentValues();
+
+//        values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
+//                transactionGroup.getDate().getTimeInMillis());
+        
+        if (expenseCategory.getId() != transactionGroup.getExpenseCategory().getId()) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, 
+                    expenseCategory.getId());
+        }
+        
+        if (fromAccount.getId() != transactionGroup.getFromAccount().getId()) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, 
+                    fromAccount.getId());
+        }
+        
+        ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
+
+        SQLiteDatabase database = dbHelper.getWritableDatabase();
+
+        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+        dataSource.updateById(transactionGroup.getId(), values);
+
+        dbHelper.close();
     }
     
     private TransactionGroup getInputTransactionGroup() {
