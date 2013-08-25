@@ -52,6 +52,17 @@ public class TransactionsDataSource {
 		return newRowId;
 	}
 	
+	public int updateById(long id, ContentValues values) {
+        String whereClause = ExpenseContract.Transaction._ID + " = ?";
+        String[] whereArgs = new String[] { Long.toString(id) };
+        return update(values, whereClause, whereArgs);
+    }
+    
+    private int update(ContentValues values, String whereClause, String[] whereArgs) {
+        int rowsAffected = database.update(TABLE_NAME, values, whereClause, whereArgs);
+        return rowsAffected;
+    }
+	
 	public int deleteByTransaction(Transaction transaction) {
 	    return deleteByTransactionId(transaction.getId());
 	}

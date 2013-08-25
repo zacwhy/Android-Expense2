@@ -25,6 +25,7 @@ import com.example.expense.data.ExpenseContract;
 import com.example.expense.data.ExpenseDbHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.data.TransactionHelper;
+import com.example.expense.data.TransactionsDataSource;
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
@@ -255,6 +256,31 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
     
     private void update(TransactionGroup transactionGroup) {
+        ContentValues transactionGroupValues = getTransactionGroupContentValues(transactionGroup);
+        
+        Transaction transaction = transactionGroup.getTransactions().get(0);
+        ContentValues transactionValues = getTransactionContentValues(transaction);
+        
+        if (transactionGroupValues.size() > 0 || transactionValues.size() > 0) {
+            ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
+    
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+    
+            if (transactionGroupValues.size() > 0) {
+                TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+                dataSource.updateById(transactionGroup.getId(), transactionGroupValues);
+            }
+            
+            if (transactionValues.size() > 0) {
+                TransactionsDataSource dataSource = new TransactionsDataSource(database);
+                dataSource.updateById(transaction.getId(), transactionValues);
+            }
+    
+            dbHelper.close();
+        }
+    }
+    
+    private ContentValues getTransactionGroupContentValues(TransactionGroup transactionGroup) {
         ExpenseCategory expenseCategory = 
                 (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
         Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
@@ -276,16 +302,29 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
                     fromAccount.getId());
         }
         
-        if (values.size() > 0) {
-            ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
+        return values;
+    }
     
-            SQLiteDatabase database = dbHelper.getWritableDatabase();
-    
-            TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
-            dataSource.updateById(transactionGroup.getId(), values);
-    
-            dbHelper.close();
+    private ContentValues getTransactionContentValues(Transaction transaction) {
+        Account toAccount = (Account) getSpinnerToAccount().getSelectedItem();
+        BigDecimal amount = new BigDecimal(getEditTextAmount().getText().toString());
+        String description = getAutoCompleteTextViewDescription().getText().toString();
+        
+        ContentValues values = new ContentValues();
+        
+        if (toAccount.getId() != transaction.getToAccount().getId()) {
+            values.put(ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID, toAccount.getId());
         }
+        
+        if (amount.compareTo(transaction.getAmount()) != 0) {
+            values.put(ExpenseContract.Transaction.COLUMN_NAME_AMOUNT, amount.toPlainString());
+        }
+        
+        if (!description.contentEquals(transaction.getDescription())) {
+            values.put(ExpenseContract.Transaction.COLUMN_NAME_DESCRIPTION, description);
+        }
+        
+        return values;
     }
     
     private TransactionGroup getInputTransactionGroup() {
