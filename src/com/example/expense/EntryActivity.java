@@ -45,6 +45,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     private ArrayAdapter<Account> mToAccountArrayAdapter;
     private ArrayAdapter<ExpenseCategory> mExpenseCategoryArrayAdapter;
 
+    private Calendar mCalendar;
     private AutoCompleteTextView mAutoCompleteTextViewDescription;
     private EditText mEditTextAmount;
     private Spinner mSpinnerExpenseCategory;
@@ -88,17 +89,17 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	    populateSpinners(accountsList, expenseCategoriesList);
 	    
         if (isNew()) {
-            mTransactionGroup = new TransactionGroup();
-            mTransactionGroup.setDate(DateHelper.getCurrentDateOnly());
+            mCalendar = DateHelper.getCurrentDateOnly();
             getButtonDelete().setVisibility(View.INVISIBLE);
         } else {
-            TransactionHelper.populateTransactionGroupChildren(mTransactionGroup, 
-                    mAccountsMap, mExpenseCategoriesMap);
+            TransactionHelper.populateTransactionGroupChildren(mTransactionGroup, mAccountsMap, 
+                    mExpenseCategoriesMap);
             
 	        populateFields(mTransactionGroup);
+	        mCalendar = (Calendar) mTransactionGroup.getDate().clone();
 	    }
 	    
-	    refreshDateOnView();
+	    refreshDateOnView(mCalendar);
         addListeners();
 	}
 	
@@ -110,8 +111,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 	
 	@Override
     public void onDateSet(DatePicker view, int year, int month, int day) {
-	    mTransactionGroup.getDate().set(year, month, day);
-	    refreshDateOnView();
+	    mCalendar.set(year, month, day);
+	    refreshDateOnView(mCalendar);
     }
     
     private boolean isNew() {
@@ -142,8 +143,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         });
     }
     
-    private void refreshDateOnView() {
-        String dateString = DateHelper.getDateWithDayOfWeekString(mTransactionGroup.getDate());
+    private void refreshDateOnView(Calendar calendar) {
+        String dateString = DateHelper.getDateWithDayOfWeekString(calendar);
         getButtonDate().setText(dateString);
     }
 	
@@ -260,8 +261,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         
         ContentValues values = new ContentValues();
 
-//        values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
-//                transactionGroup.getDate().getTimeInMillis());
+        if (mCalendar.compareTo(transactionGroup.getDate()) != 0) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
+                    mCalendar.getTimeInMillis());
+        }
         
         if (expenseCategory.getId() != transactionGroup.getExpenseCategory().getId()) {
             values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, 
@@ -273,14 +276,16 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
                     fromAccount.getId());
         }
         
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
-
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
-
-        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
-        dataSource.updateById(transactionGroup.getId(), values);
-
-        dbHelper.close();
+        if (values.size() > 0) {
+            ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
+    
+            SQLiteDatabase database = dbHelper.getWritableDatabase();
+    
+            TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+            dataSource.updateById(transactionGroup.getId(), values);
+    
+            dbHelper.close();
+        }
     }
     
     private TransactionGroup getInputTransactionGroup() {
@@ -289,6 +294,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         
         Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
         
+        mTransactionGroup = new TransactionGroup();
+        mTransactionGroup.setDate(mCalendar);
         mTransactionGroup.setExpenseCategory(expenseCategory);
         mTransactionGroup.setFromAccount(fromAccount);
         
