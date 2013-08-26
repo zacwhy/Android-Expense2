@@ -1,8 +1,13 @@
 package com.example.expense;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
+import com.example.expense.data.ExpenseDbHelper;
 
 public class MainActivity extends Activity {
 
@@ -10,22 +15,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        //InitialDataLoader.initialize(this);
+        //quickInsert(this);
         
-        // SummaryActivity SummaryTwoActivity SummaryThreeActivity SummaryBbbActivity
         Intent intent = new Intent(this, SummaryActivity.class);
         startActivity(intent);
         
         finish();
-        
-        //setContentView(R.layout.activity_main);
     }
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
+    
+    private static void quickInsert(Context context) {
+        ExpenseDbHelper expenseDbHelper = new ExpenseDbHelper(context);
+        SQLiteDatabase db = expenseDbHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("column_name", "value");
+        db.insert("", null, values);
+        expenseDbHelper.close();
+    }
     
 }
