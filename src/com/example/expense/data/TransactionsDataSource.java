@@ -2,25 +2,20 @@ package com.example.expense.data;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Map;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.SqlHelper;
 import com.example.expense.models.Account;
-import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionsDataSource {
 	
-	private static final String TABLE_NAME = 
+	private static final String QUOTED_TABLE_NAME = 
 	        SqlHelper.quote(ExpenseContract.Transaction.TABLE_NAME);
 
 	private SQLiteDatabase database;
@@ -48,7 +43,7 @@ public class TransactionsDataSource {
         values.put(ExpenseContract.Transaction.COLUMN_NAME_DESCRIPTION, 
                 transaction.getDescription());
 
-		long newRowId = database.insert(TABLE_NAME, null, values);
+		long newRowId = database.insert(QUOTED_TABLE_NAME, null, values);
 		return newRowId;
 	}
 	
@@ -59,7 +54,7 @@ public class TransactionsDataSource {
     }
     
     private int update(ContentValues values, String whereClause, String[] whereArgs) {
-        int rowsAffected = database.update(TABLE_NAME, values, whereClause, whereArgs);
+        int rowsAffected = database.update(QUOTED_TABLE_NAME, values, whereClause, whereArgs);
         return rowsAffected;
     }
 	
@@ -80,7 +75,7 @@ public class TransactionsDataSource {
 	}
 	
 	private int delete(String whereClause, String[] whereArgs) {
-	    int rowsAffected = database.delete(TABLE_NAME, whereClause, whereArgs);
+	    int rowsAffected = database.delete(QUOTED_TABLE_NAME, whereClause, whereArgs);
         return rowsAffected;
 	}
 	
@@ -106,7 +101,7 @@ public class TransactionsDataSource {
 	    String having = null;
 	    String orderBy = null;
 	    
-	    Cursor cursor = database.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, 
+	    Cursor cursor = database.query(QUOTED_TABLE_NAME, columns, selection, selectionArgs, groupBy, 
 	            having, orderBy);
 	    
 	    List<Transaction> items = new ArrayList<Transaction>();
@@ -124,21 +119,13 @@ public class TransactionsDataSource {
 	}
 	
 	private Transaction cursorToTransaction(Cursor cursor) {
-	    long id = cursor.getLong(0);
-        long transactionGroupId = cursor.getLong(1);
+        TransactionGroup transactionGroup = new TransactionGroup(cursor.getLong(1));
         int sequence = cursor.getInt(2);
-        long toAccountId = cursor.getLong(3);
+        Account toAccount = new Account(cursor.getLong(3));
         BigDecimal amount = new BigDecimal(cursor.getString(4));
         String description = cursor.getString(5);
-        
-        TransactionGroup transactionGroup = new TransactionGroup();
-        transactionGroup.setId(transactionGroupId);
-        
-        Account toAccount = new Account();
-        toAccount.setId(toAccountId);
 
-        Transaction transaction = new Transaction();
-        transaction.setId(id);
+        Transaction transaction = new Transaction(cursor.getLong(0));
         transaction.setTransactionGroup(transactionGroup);
         transaction.setSequence(sequence);
         transaction.setToAccount(toAccount);
@@ -147,93 +134,5 @@ public class TransactionsDataSource {
 
         return transaction;
 	}
-	
-	public List<Transaction> getTransactions(Map<Long, Account> accounts, 
-            Map<Long, ExpenseCategory> expenseCategories) {
-	    
-        return getTransactionsWithParameters(null, null, accounts, expenseCategories);
-    }
-    
-    private List<Transaction> getTransactionsWithParameters(String selection, 
-            String[] selectionArgs,
-            Map<Long, Account> accounts, 
-            Map<Long, ExpenseCategory> expenseCategories) {
-        
-        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
-        
-        String inTables = SqlHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
-                ExpenseContract.Transaction.TABLE_NAME,
-                ExpenseContract.TransactionGroup.TABLE_NAME,
-                ExpenseContract.Transaction.TABLE_NAME,
-                ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID,
-                ExpenseContract.TransactionGroup.TABLE_NAME,
-                ExpenseContract.TransactionGroup._ID);
-        
-        sqliteQueryBuilder.setTables(inTables);
-        
-        String[] projectionIn = null;
-        String groupBy = null;
-        String having = null;
-        
-        String sortOrder = SqlHelper.format("%s.%s DESC, %s.%s DESC",
-                ExpenseContract.TransactionGroup.TABLE_NAME,
-                ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
-                ExpenseContract.TransactionGroup.TABLE_NAME,
-                ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE);
-        
-        Cursor cursor = sqliteQueryBuilder.query(database, projectionIn, selection, selectionArgs, 
-                groupBy, having, sortOrder);
-        
-        List<Transaction> items = new ArrayList<Transaction>();
-        
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast()) {
-            Transaction item = cursorToTransaction(cursor, accounts, expenseCategories);
-            items.add(item);
-            cursor.moveToNext();
-        }
-        
-        // Make sure to close the cursor
-        cursor.close();
-        
-        return items;
-    }
-    
-    private Transaction cursorToTransaction(Cursor cursor, Map<Long, Account> accounts, 
-            Map<Long, ExpenseCategory> expenseCategories) {
-        
-        long transactionId = cursor.getLong(0);
-        long transactionGroupId = cursor.getLong(1);
-        int transactionSequence = cursor.getInt(2);
-        //long fromAccountId = cursor.getLong(3);
-        long toAccountId = cursor.getLong(4);
-        BigDecimal amount = new BigDecimal(cursor.getString(5));
-        String description = cursor.getString(6);
-        //long transactionGroupId2 = cursor.getLong(7);
-        Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(8));
-        int transactionGroupSequence = cursor.getInt(9);
-        long expenseCategoryId = cursor.getLong(10);
-        
-        ExpenseCategory expenseCategory = expenseCategories.get(expenseCategoryId);
-        //Account fromAccount = accounts.get(fromAccountId);
-        Account toAccount = accounts.get(toAccountId);
-
-        TransactionGroup transactionGroup = new TransactionGroup();
-        transactionGroup.setId(transactionGroupId);
-        transactionGroup.setDate(date);
-        transactionGroup.setSequence(transactionGroupSequence);
-        transactionGroup.setExpenseCategory(expenseCategory);
-        
-        Transaction transaction = new Transaction();
-        transaction.setId(transactionId);
-        transaction.setTransactionGroup(transactionGroup);
-        transaction.setSequence(transactionSequence);
-        //transaction.setFromAccount(fromAccount);
-        transaction.setToAccount(toAccount);
-        transaction.setAmount(amount);
-        transaction.setDescription(description);
-
-        return transaction;
-    }
 
 }

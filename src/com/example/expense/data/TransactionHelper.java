@@ -1,16 +1,21 @@
 package com.example.expense.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.expense.helpers.Helper;
+import com.example.common.MultiComparator;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
+import com.example.expense.models.TransactionGroupDateComparator;
+import com.example.expense.models.TransactionGroupSequenceComparator;
 
 public final class TransactionHelper {
     
@@ -38,20 +43,37 @@ public final class TransactionHelper {
         dbHelper.close();
     }
     
-    public static List<Transaction> getTransactions(Context context) {
+    public static List<TransactionGroup> getTransactionGroups(Context context) {
+        Map<Long, TransactionGroup> map = getTransactionGroupsMap(context);
+        
+        List<TransactionGroup> list = new ArrayList<TransactionGroup>(map.values());
+        
+        List<Comparator<TransactionGroup>> comparatorList = 
+                new ArrayList<Comparator<TransactionGroup>>();
+        
+        comparatorList.add(new TransactionGroupDateComparator(true));
+        comparatorList.add(new TransactionGroupSequenceComparator(true));
+        
+        Comparator<TransactionGroup> comparator = 
+                new MultiComparator<TransactionGroup>(comparatorList);
+        
+        Collections.sort(list, comparator);
+        
+        return list;
+    }
+    
+    private static Map<Long, TransactionGroup> getTransactionGroupsMap(Context context) {
         ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
         
         SQLiteDatabase database = dbHelper.getReadableDatabase();
-        
-        Map<Long, Account> accounts = Helper.getAccountsMap(database);
-        Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
 
-        TransactionsDataSource dataSource = new TransactionsDataSource(database);
-        List<Transaction> transactions = dataSource.getTransactions(accounts, expenseCategories);
+        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
+        Map<Long, TransactionGroup> transactionGroups = 
+                dataSource.getTransactionGroupsWithTransactions(null, null);
 
         dbHelper.close();
 
-        return transactions;
+        return transactionGroups;
     }
 
     public static void populateTransactionGroupChildren(TransactionGroup transactionGroup,

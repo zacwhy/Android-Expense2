@@ -1,12 +1,16 @@
 package com.example.expense.data;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.SqlHelper;
@@ -17,7 +21,7 @@ import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
 	
-	private static final String TABLE_NAME = 
+	private static final String QUOTED_TABLE_NAME = 
 	        SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
 
 	private SQLiteDatabase database;
@@ -50,7 +54,7 @@ public class TransactionGroupsDataSource {
         values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, 
                 transactionGroup.getFromAccount().getId());
 
-		long newRowId = database.insert(TABLE_NAME, null, values);
+		long newRowId = database.insert(QUOTED_TABLE_NAME, null, values);
 		return newRowId;
 	}
 	
@@ -61,7 +65,7 @@ public class TransactionGroupsDataSource {
 	}
 	
 	private int update(ContentValues values, String whereClause, String[] whereArgs) {
-	    int rowsAffected = database.update(TABLE_NAME, values, whereClause, whereArgs);
+	    int rowsAffected = database.update(QUOTED_TABLE_NAME, values, whereClause, whereArgs);
 	    return rowsAffected;
 	}
 	
@@ -76,7 +80,7 @@ public class TransactionGroupsDataSource {
     }
 	
 	private int delete(String whereClause, String[] whereArgs) {
-	    int rowsAffected = database.delete(TABLE_NAME, whereClause, whereArgs);
+	    int rowsAffected = database.delete(QUOTED_TABLE_NAME, whereClause, whereArgs);
         return rowsAffected;
 	}
 	
@@ -118,7 +122,7 @@ public class TransactionGroupsDataSource {
 	    String having = null;
 	    String orderBy = null;
 
-	    Cursor cursor = database.query(TABLE_NAME, columns, selection, selectionArgs, groupBy, 
+	    Cursor cursor = database.query(QUOTED_TABLE_NAME, columns, selection, selectionArgs, groupBy, 
 	            having, orderBy);
 	    
 	    List<TransactionGroup> items = new ArrayList<TransactionGroup>();
@@ -139,14 +143,8 @@ public class TransactionGroupsDataSource {
 	    long id = cursor.getLong(0);
 	    Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(1));
 	    int sequence = cursor.getInt(2);
-	    long expenseCategoryId = cursor.getLong(3);
-	    long fromAccountId = cursor.getLong(4);
-	    
-	    ExpenseCategory expenseCategory = new ExpenseCategory();
-	    expenseCategory.setId(expenseCategoryId);
-	    
-	    Account fromAccount = new Account();
-	    fromAccount.setId(fromAccountId);
+	    ExpenseCategory expenseCategory = new ExpenseCategory(cursor.getLong(3));
+	    Account fromAccount = new Account(cursor.getLong(4));
 	    
 	    TransactionGroup transactionGroup = new TransactionGroup();
 	    transactionGroup.setId(id);
@@ -156,6 +154,99 @@ public class TransactionGroupsDataSource {
 	    transactionGroup.setFromAccount(fromAccount);
 	    
 	    return transactionGroup;
+	}
+	
+	public Map<Long, TransactionGroup> getTransactionGroupsWithTransactions(String selection, 
+            String[] selectionArgs) {
+        
+        SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
+        
+        String inTables = SqlHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
+                ExpenseContract.Transaction.TABLE_NAME,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.Transaction.TABLE_NAME,
+                ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID,
+                ExpenseContract.TransactionGroup.TABLE_NAME,
+                ExpenseContract.TransactionGroup._ID);
+        
+        sqliteQueryBuilder.setTables(inTables);
+        
+        String[] projectionIn = {
+                SqlHelper.format("%s.%s", ExpenseContract.TransactionGroup.TABLE_NAME, ExpenseContract.TransactionGroup._ID),
+                SqlHelper.format("%s.%s", ExpenseContract.TransactionGroup.TABLE_NAME, ExpenseContract.TransactionGroup.COLUMN_NAME_DATE),
+                SqlHelper.format("%s.%s", ExpenseContract.TransactionGroup.TABLE_NAME, ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE),
+                SqlHelper.format("%s.%s", ExpenseContract.TransactionGroup.TABLE_NAME, ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID),
+                SqlHelper.format("%s.%s", ExpenseContract.TransactionGroup.TABLE_NAME, ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID),
+                
+                SqlHelper.format("%s.%s", ExpenseContract.Transaction.TABLE_NAME, ExpenseContract.Transaction._ID),
+                SqlHelper.format("%s.%s", ExpenseContract.Transaction.TABLE_NAME, ExpenseContract.Transaction.COLUMN_NAME_SEQUENCE),
+                SqlHelper.format("%s.%s", ExpenseContract.Transaction.TABLE_NAME, ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID),
+                SqlHelper.format("%s.%s", ExpenseContract.Transaction.TABLE_NAME, ExpenseContract.Transaction.COLUMN_NAME_AMOUNT),
+                SqlHelper.format("%s.%s", ExpenseContract.Transaction.TABLE_NAME, ExpenseContract.Transaction.COLUMN_NAME_DESCRIPTION)
+        };
+        
+        String groupBy = null;
+        String having = null;
+        String sortOrder = null;
+        
+        Cursor cursor = sqliteQueryBuilder.query(database, projectionIn, selection, selectionArgs, 
+                groupBy, having, sortOrder);
+        
+        Map<Long, TransactionGroup> transactionGroupsMap = new HashMap<Long, TransactionGroup>();
+        
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+
+            TransactionGroup transactionGroup;
+            long transactionGroupId = cursor.getLong(0);
+            if (transactionGroupsMap.containsKey(transactionGroupId)) {
+                transactionGroup = transactionGroupsMap.get(transactionGroupId);
+            } else {
+                transactionGroup = cursorToTransactionGroup2(cursor, transactionGroupId);
+                transactionGroupsMap.put(transactionGroupId, transactionGroup);
+            }
+            
+            Transaction transaction = cursorToTransaction(cursor);
+            transactionGroup.getTransactions().add(transaction);
+            
+            cursor.moveToNext();
+        }
+        
+        // Make sure to close the cursor
+        cursor.close();
+        
+        return transactionGroupsMap;
+    }
+	
+	private Transaction cursorToTransaction(Cursor cursor) {
+	    long transactionId = cursor.getLong(5);
+	    int sequence = cursor.getInt(6);
+	    Account toAccount = new Account(cursor.getLong(7));
+        BigDecimal amount = new BigDecimal(cursor.getString(8));
+        String description = cursor.getString(9);
+        
+        Transaction transaction = new Transaction(transactionId);
+        transaction.setSequence(sequence);
+        transaction.setToAccount(toAccount);
+        transaction.setAmount(amount);
+        transaction.setDescription(description);
+        
+        return transaction;
+	}
+	
+	private TransactionGroup cursorToTransactionGroup2(Cursor cursor, long id) {
+	    Calendar date = DateHelper.getCalendarFromMilliseconds(cursor.getLong(1));
+        int sequence = cursor.getInt(2);
+        ExpenseCategory expenseCategory = new ExpenseCategory(cursor.getLong(3));
+        Account fromAccount = new Account(cursor.getLong(4));
+        
+        TransactionGroup transactionGroup = new TransactionGroup(id);
+        transactionGroup.setDate(date);
+        transactionGroup.setSequence(sequence);
+        transactionGroup.setExpenseCategory(expenseCategory);
+        transactionGroup.setFromAccount(fromAccount);
+        
+        return transactionGroup;
 	}
 	
 	private int getMaxSequence(Calendar calendar) {
