@@ -77,9 +77,9 @@ public class SummaryActivity extends ListActivity {
             
             if (action.contentEquals(EntryActivity.ACTION_DELETE)) {
                 mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
+            } else {
+                loadListView(); // TODO remove
             }
-        } else {
-            loadListView(); // TODO remove
         }
     }
     

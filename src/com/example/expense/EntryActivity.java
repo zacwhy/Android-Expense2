@@ -37,6 +37,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     
     public final static String EXTRA_TRANSACTION_GROUP_ID = "com.example.expense.TRANSACTION_ID";
     public final static String EXTRA_ACTION = "com.example.expense.ACTION";
+    public final static String ACTION_INSERT = "insert";
+    public final static String ACTION_UPDATE = "update";
     public final static String ACTION_DELETE = "delete";
     
     private long mTransactionGroupId;
@@ -212,15 +214,15 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
     }
 	
 	private void showDatePickerDialog(View v) {
-        Calendar calendar = mTransactionGroup.getDate();
+        Calendar calendar = mCalendar;
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         
         Bundle args = new Bundle();
-        args.putInt("year", year);
-        args.putInt("month", month);
-        args.putInt("day", day);
+        args.putInt(DatePickerFragment.EXTRA_YEAR, year);
+        args.putInt(DatePickerFragment.EXTRA_MONTH, month);
+        args.putInt(DatePickerFragment.EXTRA_DAY, day);
         
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.setArguments(args);
@@ -231,8 +233,10 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         if (validateInputs()) {
             if (isNew()) {
                 TransactionHelper.insertTransactionGroup(this, getInputTransactionGroup());
+                close(ACTION_INSERT);
             } else {
                 update(mTransactionGroup);
+                close(ACTION_UPDATE);
             }
             finish();
         }
@@ -240,9 +244,12 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
 
     private void onClickButtonDelete() {
         TransactionHelper.deleteTransactionGroup(this, mTransactionGroup.getId());
-        
+        close(ACTION_DELETE);
+    }
+    
+    private void close(String action) {
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_ACTION, ACTION_DELETE);
+        intent.putExtra(EXTRA_ACTION, action);
         setResult(RESULT_OK, intent);
         finish();
     }

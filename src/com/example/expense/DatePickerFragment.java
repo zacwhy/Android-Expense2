@@ -1,5 +1,8 @@
 package com.example.expense;
 
+import java.util.Calendar;
+
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.DatePickerDialog.OnDateSetListener;
 import android.app.Dialog;
@@ -12,22 +15,43 @@ import android.support.v4.app.DialogFragment;
 //
 
 public class DatePickerFragment extends DialogFragment {
+    
+    public final static String EXTRA_YEAR = "com.example.expense.year";
+    public final static String EXTRA_MONTH = "com.example.expense.month";
+    public final static String EXTRA_DAY = "com.example.expense.day";
+    
+    private final static int DEFAULT_VALUE = -1;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-	    int year = getArguments().getInt("year");
-	    int month = getArguments().getInt("month");
-	    int day = getArguments().getInt("day");
+	    Bundle arguments = getArguments();
 	    
-		// Use the current date as the default date in the picker
-//		final Calendar c = Calendar.getInstance();
-//		int year = c.get(Calendar.YEAR);
-//		int month = c.get(Calendar.MONTH);
-//		int day = c.get(Calendar.DAY_OF_MONTH);
+	    int year = arguments.getInt(EXTRA_YEAR, DEFAULT_VALUE);
+	    int month = arguments.getInt(EXTRA_MONTH, DEFAULT_VALUE);
+	    int day = arguments.getInt(EXTRA_DAY, DEFAULT_VALUE);
+	    
+	    if (year == DEFAULT_VALUE || month == DEFAULT_VALUE || day == DEFAULT_VALUE) {
+	        // Use the current date as the default date in the picker
+	        final Calendar calendar = Calendar.getInstance();
+	        
+	        if (year == DEFAULT_VALUE) {
+	            year = calendar.get(Calendar.YEAR);
+	        }
+	        
+	        if (month == DEFAULT_VALUE) {
+	            month = calendar.get(Calendar.MONTH);
+	        }
+	        
+	        if (day == DEFAULT_VALUE) {
+	            day = calendar.get(Calendar.DAY_OF_MONTH);
+	        }
+	    }
 
-		// Create a new instance of DatePickerDialog and return it
-	    OnDateSetListener callBack = (OnDateSetListener) getActivity();
-		return new DatePickerDialog(getActivity(), callBack, year, month, day);
+	    Activity activity = getActivity();
+	    
+	    OnDateSetListener callBack = (OnDateSetListener) activity;
+	    
+		return new DatePickerDialog(activity, callBack, year, month, day);
 	}
 
 }
