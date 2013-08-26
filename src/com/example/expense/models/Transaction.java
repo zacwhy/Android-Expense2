@@ -11,6 +11,14 @@ public class Transaction {
     private BigDecimal amount;
     private String description;
     
+    public Transaction(long id) {
+        setId(id);
+    }
+    
+    public Transaction() {
+        
+    }
+
     public long getId() {
         return id;
     }

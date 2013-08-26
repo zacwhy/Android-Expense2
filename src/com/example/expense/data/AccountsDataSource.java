@@ -72,8 +72,7 @@ public class AccountsDataSource {
 	}
 	
 	private Account cursorToItem(Cursor cursor) {
-	    Account item = new Account();
-		item.setId(cursor.getLong(0));
+	    Account item = new Account(cursor.getLong(0));
 		item.setName(cursor.getString(1));
 		return item;
 	}

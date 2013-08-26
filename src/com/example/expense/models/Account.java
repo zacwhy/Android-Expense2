@@ -5,6 +5,10 @@ public class Account {
 	private long id;
 	private String name;
 	
+	public Account(long id) {
+	    setId(id);
+	}
+	
 	public long getId() {
 		return id;
 	}

@@ -97,8 +97,7 @@ public class ExpenseCategoriesDataSource {
 	}
 	
 	private ExpenseCategory cursorToExpenseCategory(Cursor cursor) {
-		ExpenseCategory expenseCategory = new ExpenseCategory();
-		expenseCategory.setId(cursor.getLong(0));
+		ExpenseCategory expenseCategory = new ExpenseCategory(cursor.getLong(0));
 		expenseCategory.setTitle(cursor.getString(1));
 		return expenseCategory;
 	}

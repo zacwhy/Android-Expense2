@@ -13,6 +13,11 @@ public class TransactionGroup {
     private Account fromAccount;
     private List<Transaction> transactions;
     
+    public TransactionGroup(long id) {
+        this();
+        setId(id);
+    }
+    
     public TransactionGroup() {
         transactions = new ArrayList<Transaction>();
     }

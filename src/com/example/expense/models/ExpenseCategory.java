@@ -5,6 +5,10 @@ public class ExpenseCategory {
 	private long id;
 	private String title;
 	
+	public ExpenseCategory(long id) {
+	    setId(id);
+	}
+	
 	public long getId() {
 		return id;
 	}
