@@ -38,22 +38,16 @@ public class SummaryActivity extends ListActivity {
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.action_add:
-			Intent intent = new Intent(this, EntryActivity.class);
-			startActivityForResult(intent, 0);
-			return true;
+	    switch (item.getItemId()) {
+	    case R.id.action_add:
+	        Intent intent = new Intent(this, EntryActivity.class);
+	        startActivityForResult(intent, 0);
+	        return true;
 
-	      case R.id.action_summary_two:
-	            startActivity(new Intent(this, SummaryTwoActivity.class));
-	            return true;
-          case R.id.action_summary_three:
-              startActivity(new Intent(this, SummaryThreeActivity.class));
-              return true;
-          case R.id.action_summary_bbb:
-              startActivity(new Intent(this, SummaryBbbActivity.class));
-              return true;
-		}
+	    case R.id.action_accounts:
+	        startActivity(new Intent(this, AccountsActivity.class));
+	        return true;
+	    }
 		return super.onOptionsItemSelected(item);
 	}
 	

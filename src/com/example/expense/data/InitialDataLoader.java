@@ -3,7 +3,9 @@ package com.example.expense.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-public class InitialDataLoader {
+public final class InitialDataLoader {
+    
+    private InitialDataLoader() {}
 	
 	public static void initialize(Context context) {
 		new InitialDataLoader(context).initializeData();
@@ -53,6 +55,7 @@ public class InitialDataLoader {
             "Ezlink",
             "Kopitiam",
             "SC BonusSaver",
+            "SC Manhattan",
             "Citi SMRT",
             "POSB Everyday",
             "POSB",
@@ -60,12 +63,12 @@ public class InitialDataLoader {
         };
 	    
 	    public final static String[] Categories = {
-	        "",
+	        "None",
 	        //"Food", "Transport", "Others",
 	        "Breakfast", "Lunch", "Dinner", "Snack",
 	        "Bus", "Train", "Bus (Work)", "Train (Work)",
 	        "Fuel", "Road", "Parking",
-	        "The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog."
+	        "Others"
 	    };
 	    
 	}

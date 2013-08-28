@@ -1,37 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Expense</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_accounts">Accounts</string>
     <string name="action_add">TODO: Remove</string>
-    <string name="action_select_payees">Add or remove payees</string>
-    <string name="error_required_amount">Amount is required!</string>
-    <string name="title_activity_summary">Transactions</string>
-    <string name="hello_world">TODO: Remove</string>
-    <string name="title_activity_entry">Transaction</string>
-    <string name="hint_description">Description</string>
-    <string name="hint_amount">Amount</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_name">Expense</string>
     <string name="button_text_delete">Delete</string>
     <string name="button_text_ok">OK</string>
-    <string name="content_description_calendar">Calendar</string>
     <string name="content_description_calculator">Calculator</string>
-    <string name="content_description_edit_tags">Edit Tags</string>
-    <string name="label_tags">Tag(s)</string>
-    <string name="title_activity_summary_two">SummaryTwoActivity</string>
-    <string name="title_section1">January 2013</string>
-    <string name="title_section2">February 2013</string>
-    <string name="title_section3">March 2013</string>
-    <string name="title_section4">Week 01 (30 Dec 2012 Sun)</string>
-    <string name="title_section5">Week 02 (06 Jan 2013 Sun)</string>
-    <string name="title_section6">Week 03 (13 Jan 2013 Sun)</string>
-    <string name="title_section7">12 Aug 2013 Mon</string>
-    <string name="title_section8">13 Aug 2013 Tue</string>
-    <string name="title_section9">14 Aug 2013 Wed</string>
-    <string name="title_section10">Year 2013</string>
-    <string name="title_section11">Year 2014</string>
-    <string name="title_section12">Year 2015</string>
-    <string name="title_activity_summary_three">SummaryThreeActivity</string>
-    <string name="title_activity_summary_aaa">SummaryAaaActivity</string>
-    <string name="title_activity_summary_bbb">SummaryBbbActivity</string>
+    <string name="content_description_calendar">Calendar</string>
+    <string name="error_required_amount">Amount is required!</string>
+    <string name="hint_amount">Amount</string>
+    <string name="hint_description">Description</string>
+    <string name="title_activity_accounts">AccountsActivity</string>
+    <string name="title_activity_entry">Transaction</string>
+    <string name="title_activity_summary">Transactions</string>
 
 </resources>

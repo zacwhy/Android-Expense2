@@ -1,13 +1,8 @@
 package com.example.expense;
 
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-
-import com.example.expense.data.ExpenseDbHelper;
 
 public class MainActivity extends Activity {
 
@@ -15,6 +10,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
+        //InitialDataLoader.initialize(this);
         //quickInsert(this);
         
         Intent intent = new Intent(this, SummaryActivity.class);
@@ -23,13 +19,13 @@ public class MainActivity extends Activity {
         finish();
     }
     
-    private static void quickInsert(Context context) {
-        ExpenseDbHelper expenseDbHelper = new ExpenseDbHelper(context);
-        SQLiteDatabase db = expenseDbHelper.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("column_name", "value");
-        db.insert("", null, values);
-        expenseDbHelper.close();
-    }
+//    private static void quickInsert(Context context) {
+//        ExpenseDbHelper expenseDbHelper = new ExpenseDbHelper(context);
+//        SQLiteDatabase db = expenseDbHelper.getWritableDatabase();
+//        ContentValues values = new ContentValues();
+//        values.put("column_name", "value");
+//        db.insert("", null, values);
+//        expenseDbHelper.close();
+//    }
     
 }

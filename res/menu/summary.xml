@@ -10,21 +10,11 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
-
-     <item
-        android:id="@+id/action_summary_two"
+    
+    <item
+        android:id="@+id/action_accounts"
         android:orderInCategory="100"
         android:showAsAction="never"
-        android:title="Summary Two"/>
-     <item
-        android:id="@+id/action_summary_three"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="Summary Three"/>
-     <item
-        android:id="@+id/action_summary_bbb"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="Summary Bbb"/>
+        android:title="@string/action_accounts"/>
      
 </menu>

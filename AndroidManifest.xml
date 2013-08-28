@@ -8,6 +8,8 @@
         android:minSdkVersion="11"
         android:targetSdkVersion="18" />
 
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -29,19 +31,11 @@
         <activity
             android:name="com.example.expense.EntryActivity"
             android:label="@string/title_activity_entry"
-            android:theme="@android:style/Theme.Dialog">
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
         <activity
-            android:name="com.example.expense.SummaryTwoActivity"
-            android:label="@string/title_activity_summary_two" >
-        </activity>
-        <activity
-            android:name="com.example.expense.SummaryThreeActivity"
-            android:label="@string/title_activity_summary_three" >
-        </activity>
-        <activity
-            android:name="com.example.expense.SummaryBbbActivity"
-            android:label="@string/title_activity_summary_bbb" >
+            android:name="com.example.expense.AccountsActivity"
+            android:label="@string/title_activity_accounts" >
         </activity>
     </application>
 
