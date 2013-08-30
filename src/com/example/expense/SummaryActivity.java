@@ -135,8 +135,20 @@ public class SummaryActivity extends ListActivity {
 	
 	private static String getLabel(TransactionGroup transactionGroup, Transaction transaction) {
 	    return DateHelper.getDateWithDayOfWeekString(transactionGroup.getDate()) + " " + 
-        	    transactionGroup.getSequence() + "." + transaction.getSequence() + " " +
-        	    transaction.getDescription(); 
+	            transactionGroup.getSequence() + "." + transaction.getSequence() + " " +
+	            getDescription(transactionGroup, transaction);
+	}
+	
+	private static String getDescription(TransactionGroup transactionGroup, 
+	        Transaction transaction) {
+	    
+	    if (transaction.getDescription().isEmpty()) {
+	        String fromAccount = transactionGroup.getFromAccount().getName();
+	        String toAccount = transaction.getToAccount().getName();
+            return fromAccount + " to " + toAccount;
+        }
+	    
+	    return transaction.getDescription();
 	}
 
 }

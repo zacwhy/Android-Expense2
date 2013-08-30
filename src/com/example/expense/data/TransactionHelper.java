@@ -10,6 +10,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.common.MultiComparator;
+import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -70,8 +71,15 @@ public final class TransactionHelper {
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
         Map<Long, TransactionGroup> transactionGroups = 
                 dataSource.getTransactionGroupsWithTransactions(null, null);
+        
+        Map<Long, Account> accounts = Helper.getAccountsMap(database);
+        Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(database);
 
         databaseHelper.close();
+        
+        for (TransactionGroup transactionGroup : transactionGroups.values()) {
+            populateTransactionGroupChildren(transactionGroup, accounts, expenseCategories);
+        }
 
         return transactionGroups;
     }
