@@ -22,25 +22,25 @@ public final class TransactionHelper {
     private TransactionHelper() {}
     
     public static void insertTransactionGroup(Context context, TransactionGroup transactionGroup) {
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(context);
         
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
         
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
         dataSource.insertLast(transactionGroup);
         
-        dbHelper.close();
+        databaseHelper.close();
     }
     
     public static void deleteTransactionGroup(Context context, long id) {
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(context);
         
-        SQLiteDatabase database = dbHelper.getWritableDatabase();
+        SQLiteDatabase database = databaseHelper.getWritableDatabase();
         
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
         dataSource.deleteByTransactionGroupId(id);
         
-        dbHelper.close();
+        databaseHelper.close();
     }
     
     public static List<TransactionGroup> getTransactionGroups(Context context) {
@@ -63,15 +63,15 @@ public final class TransactionHelper {
     }
     
     private static Map<Long, TransactionGroup> getTransactionGroupsMap(Context context) {
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(context);
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(context);
         
-        SQLiteDatabase database = dbHelper.getReadableDatabase();
+        SQLiteDatabase database = databaseHelper.getReadableDatabase();
 
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
         Map<Long, TransactionGroup> transactionGroups = 
                 dataSource.getTransactionGroupsWithTransactions(null, null);
 
-        dbHelper.close();
+        databaseHelper.close();
 
         return transactionGroups;
     }

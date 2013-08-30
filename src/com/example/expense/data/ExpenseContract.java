@@ -4,7 +4,7 @@ import android.provider.BaseColumns;
 
 public final class ExpenseContract {
 
-    public ExpenseContract() {}
+    private ExpenseContract() {}
 
     public static abstract class ExpenseCategory implements BaseColumns {
         public static final String TABLE_NAME = "expense_category";

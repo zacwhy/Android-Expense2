@@ -22,7 +22,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.example.expense.data.ExpenseContract;
-import com.example.expense.data.ExpenseDbHelper;
+import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.data.TransactionHelper;
 import com.example.expense.data.TransactionsDataSource;
@@ -68,8 +68,8 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         
         // database access
         
-        ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
-        SQLiteDatabase readableDatabase = dbHelper.getReadableDatabase();
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
+        SQLiteDatabase readableDatabase = databaseHelper.getReadableDatabase();
         
         List<Account> accountsList = Helper.getAccounts(readableDatabase);
         List<ExpenseCategory> expenseCategoriesList = Helper.getExpenseCategories(readableDatabase);
@@ -82,7 +82,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
                     dataSource.getTransactionGroupWithTransactionsById(mTransactionGroupId);
         }
         
-        dbHelper.close();
+        databaseHelper.close();
 
 	    
 	    Map<Long, Account> mAccountsMap = Helper.convertToAccountsMap(accountsList);
@@ -269,9 +269,9 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
         ContentValues transactionValues = getTransactionContentValues(transaction);
         
         if (transactionGroupValues.size() > 0 || transactionValues.size() > 0) {
-            ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
+            ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
     
-            SQLiteDatabase database = dbHelper.getWritableDatabase();
+            SQLiteDatabase database = databaseHelper.getWritableDatabase();
     
             if (transactionGroupValues.size() > 0) {
                 TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
@@ -283,7 +283,7 @@ public class EntryActivity extends FragmentActivity implements OnDateSetListener
                 dataSource.updateById(transaction.getId(), transactionValues);
             }
     
-            dbHelper.close();
+            databaseHelper.close();
         }
     }
     

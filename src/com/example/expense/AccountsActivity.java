@@ -1,12 +1,14 @@
 package com.example.expense;
 
+import com.example.expense.content.AccountProvider;
+import com.example.expense.data.ExpenseContract;
+
 import android.app.ListActivity;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +17,23 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 
-public class AccountsActivity extends ListActivity
-        implements LoaderCallbacks<Cursor> {
+//
+// http://developer.android.com/guide/topics/ui/layout/listview.html
+//
+
+public class AccountsActivity extends ListActivity implements LoaderCallbacks<Cursor> {
 
     // This is the Adapter being used to display the list's data
     SimpleCursorAdapter mAdapter;
 
     // These are the Contacts rows that we will retrieve
-    static final String[] PROJECTION = new String[] {ContactsContract.Data._ID,
-        ContactsContract.Data.DISPLAY_NAME};
+    static final String[] PROJECTION = new String[] {
+        ExpenseContract.Account._ID,
+        ExpenseContract.Account.COLUMN_NAME_NAME
+    };
 
     // This is the select criteria
-    static final String SELECTION = "((" + 
-            ContactsContract.Data.DISPLAY_NAME + " NOTNULL) AND (" +
-            ContactsContract.Data.DISPLAY_NAME + " != '' ))";
+    static final String SELECTION = null;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +51,7 @@ public class AccountsActivity extends ListActivity
         root.addView(progressBar);
 
         // For the cursor adapter, specify which columns go into which views
-        String[] fromColumns = {ContactsContract.Data.DISPLAY_NAME};
+        String[] fromColumns = { ExpenseContract.Account.COLUMN_NAME_NAME };
         int[] toViews = {android.R.id.text1}; // The TextView in simple_list_item_1
 
         // Create an empty adapter we will use to display the loaded data.
@@ -72,7 +77,7 @@ public class AccountsActivity extends ListActivity
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
-        return new CursorLoader(this, ContactsContract.Data.CONTENT_URI,
+        return new CursorLoader(this, AccountProvider.CONTENT_URI,
                 PROJECTION, SELECTION, null, null);
     }
 

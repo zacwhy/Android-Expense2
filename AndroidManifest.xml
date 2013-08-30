@@ -7,8 +7,6 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="18" />
-
-    <uses-permission android:name="android.permission.READ_CONTACTS" />
     
     <application
         android:allowBackup="true"
@@ -37,6 +35,14 @@
             android:name="com.example.expense.AccountsActivity"
             android:label="@string/title_activity_accounts" >
         </activity>
+        
+        <provider
+            android:name="com.example.expense.content.AccountProvider"
+            android:authorities="com.zacwhy.expense.provider"
+            android:multiprocess="true"
+            android:exported="false">
+        </provider>
+        
     </application>
 
 </manifest>

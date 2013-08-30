@@ -18,13 +18,13 @@ public final class InitialDataLoader {
 	}
 
 	public void initializeData() {
-		ExpenseDbHelper dbHelper = new ExpenseDbHelper(mContext);
-		SQLiteDatabase database = dbHelper.getWritableDatabase();
+		ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(mContext);
+		SQLiteDatabase database = databaseHelper.getWritableDatabase();
 		
         initializeAccounts(database);
 		initializeExpenseCategories(database);
 		
-		dbHelper.close();
+		databaseHelper.close();
 	}
     
 	private void initializeAccounts(SQLiteDatabase database) {

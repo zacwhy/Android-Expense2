@@ -9,13 +9,13 @@ import com.example.expense.data.ExpenseContract.ExpenseCategory;
 import com.example.expense.data.ExpenseContract.Transaction;
 import com.example.expense.data.ExpenseContract.TransactionGroup;
 
-public class ExpenseDbHelper extends SQLiteOpenHelper {
+public class ExpenseDatabaseHelper extends SQLiteOpenHelper {
 	
 	// If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "Expense.db";
 
-	public ExpenseDbHelper(Context context) {
+	public ExpenseDatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 

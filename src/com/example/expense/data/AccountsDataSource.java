@@ -49,15 +49,20 @@ public class AccountsDataSource {
 		return count;
 	}
 	
-	public List<Account> getAll() {
-		List<Account> items = new ArrayList<Account>();
-
+	public Cursor getCursor() {
 		String[] allColumns = { 
 				ExpenseContract.Account._ID,
 				ExpenseContract.Account.COLUMN_NAME_NAME
 		};
 		
 		Cursor cursor = database.query(TABLE_NAME, allColumns, null, null, null, null, null);
+		return cursor;
+	}
+	
+	public List<Account> getAll() {
+        List<Account> items = new ArrayList<Account>();
+        
+        Cursor cursor = getCursor();
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
