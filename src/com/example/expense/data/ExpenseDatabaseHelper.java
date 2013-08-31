@@ -25,6 +25,8 @@ public class ExpenseDatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(SQL_CREATE_EXPENSE_CATEGORIES);
 		db.execSQL(SQL_CREATE_TRANSACTION_GROUPS);
         db.execSQL(SQL_CREATE_TRANSACTIONS);
+        
+        InitialDataLoader.initializeData(db);
 	}
 
 	@Override

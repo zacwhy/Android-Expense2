@@ -2,24 +2,34 @@ package com.example.expense;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.expense.data.ExpenseDatabaseHelper;
+import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.data.TransactionHelper;
 import com.example.expense.helpers.DateHelper;
+import com.example.expense.helpers.Helper;
+import com.example.expense.models.Account;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
+import com.example.expense.models.TransactionGroupListComparator;
 
 public class SummaryActivity extends ListActivity {
 
+    private List<SummaryListItem> listItems;
     private SummaryArrayAdapter mSummaryArrayAdapter;
     private int mPosition;
     
@@ -56,9 +66,11 @@ public class SummaryActivity extends ListActivity {
         mPosition = position;
         
 	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
+	    Transaction transaction = (Transaction) listItem.getUnderlyingObject();
+	    long transactionGroupId = transaction.getTransactionGroup().getId();
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
-	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_GROUP_ID, listItem.getId());
+	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_GROUP_ID, transactionGroupId);
 	    startActivityForResult(intent, 0);
     }
 	
@@ -74,8 +86,7 @@ public class SummaryActivity extends ListActivity {
                 
             } else if (action.contentEquals(EntryActivity.ACTION_UPDATE)) {
                 
-                loadListView();
-                //refreshUpdate();
+                refreshUpdate();
                 
             } else if (action.contentEquals(EntryActivity.ACTION_INSERT)) {
                 
@@ -85,33 +96,71 @@ public class SummaryActivity extends ListActivity {
         }
     }
     
-//    private void refreshUpdate() {
-//        SummaryListItem listItem = mSummaryArrayAdapter.getItem(mPosition);
-//        
-//        ExpenseDbHelper dbHelper = new ExpenseDbHelper(this);
-//        
-//        SQLiteDatabase database = dbHelper.getReadableDatabase();
-//        
-//        long transactionGroupId = listItem.getId();
-//        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(database);
-//        TransactionGroup transactionGroup = 
-//                dataSource.getTransactionGroupWithTransactionsById(transactionGroupId);
-//        
-//        dbHelper.close();
-//        
-//        Transaction transaction = transactionGroup.getTransactions().get(0);
-//        String label = getLabel(transactionGroup, transaction);
-//        
-//        listItem.setLabel(label);
-//        listItem.setAmount(transaction.getAmount());
-//        
-//        mSummaryArrayAdapter.notifyDataSetChanged();
-//    }
+    private void refreshUpdate() {
+        SummaryListItem listItem = mSummaryArrayAdapter.getItem(mPosition);
+        
+        Transaction transaction2 = (Transaction) listItem.getUnderlyingObject();
+        long transactionGroupId = transaction2.getTransactionGroup().getId();
+        
+        
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
+        
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        
+        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
+        TransactionGroup transactionGroup = dataSource.getTransactionGroupWithTransactionsById(transactionGroupId);
+        
+        Map<Long, Account> accountsMap = Helper.getAccountsMap(db);
+        
+        databaseHelper.close();
+        
+        
+        long fromAccountId = transactionGroup.getFromAccount().getId();
+        Account fromAccount = accountsMap.get(fromAccountId);
+        transactionGroup.setFromAccount(fromAccount);
+        
+        
+        Transaction transaction = transactionGroup.getTransactions().get(0);
+        
+        long toAccountId = transaction.getToAccount().getId();
+        Account toAccount = accountsMap.get(toAccountId);
+        transaction.setToAccount(toAccount);
+        
+        String label = getLabel(transactionGroup, transaction);        
+        
+        SummaryListItem newListItem = new SummaryListItem(transaction, label, transaction.getAmount());
+        
+        listItems.remove(mPosition);
+        listItems.add(newListItem);
+        
+        sortListItems();
+        
+        mSummaryArrayAdapter.notifyDataSetChanged();
+    }
+    
+    private void sortListItems() {
+        final Comparator<TransactionGroup> comparator = new TransactionGroupListComparator(true);
+        
+        Collections.sort(listItems, new Comparator<SummaryListItem>() {
+
+            @Override
+            public int compare(SummaryListItem lhs, SummaryListItem rhs) {
+                
+                Transaction t1 = (Transaction) lhs.getUnderlyingObject();
+                Transaction t2 = (Transaction) rhs.getUnderlyingObject();
+                
+                TransactionGroup g1 = t1.getTransactionGroup();
+                TransactionGroup g2 = t2.getTransactionGroup();
+                
+                return comparator.compare(g1, g2);
+            }
+            
+        });
+    }
     
 	private void loadListView() {
         List<TransactionGroup> list = TransactionHelper.getTransactionGroups(this);
-	    List<SummaryListItem> listItems = getListItems(list);
-	    
+        listItems = getListItems(list);
 	    mSummaryArrayAdapter = new SummaryArrayAdapter(this, listItems);
 		setListAdapter(mSummaryArrayAdapter);
 	}
@@ -120,12 +169,10 @@ public class SummaryActivity extends ListActivity {
 	    List<SummaryListItem> items = new ArrayList<SummaryListItem>();
 	    
 	    for (TransactionGroup transactionGroup : transactionGroups) {
-	        long id = transactionGroup.getId();
-	        
 	        for (Transaction transaction : transactionGroup.getTransactions()) {
 	            String label = getLabel(transactionGroup, transaction);
 	            BigDecimal amount = transaction.getAmount();
-	            SummaryListItem item = new SummaryListItem(id, label, amount, 0);
+	            SummaryListItem item = new SummaryListItem(transaction, label, amount);
 	            items.add(item);
 	        }
 	    }

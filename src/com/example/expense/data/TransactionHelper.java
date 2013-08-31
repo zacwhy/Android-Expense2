@@ -9,14 +9,12 @@ import java.util.Map;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.common.MultiComparator;
 import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
-import com.example.expense.models.TransactionGroupDateComparator;
-import com.example.expense.models.TransactionGroupSequenceComparator;
+import com.example.expense.models.TransactionGroupListComparator;
 
 public final class TransactionHelper {
     
@@ -47,16 +45,9 @@ public final class TransactionHelper {
     public static List<TransactionGroup> getTransactionGroups(Context context) {
         Map<Long, TransactionGroup> map = getTransactionGroupsMap(context);
         
+        Comparator<TransactionGroup> comparator = new TransactionGroupListComparator(true);
+        
         List<TransactionGroup> list = new ArrayList<TransactionGroup>(map.values());
-        
-        List<Comparator<TransactionGroup>> comparatorList = 
-                new ArrayList<Comparator<TransactionGroup>>();
-        
-        comparatorList.add(new TransactionGroupDateComparator(true));
-        comparatorList.add(new TransactionGroupSequenceComparator(true));
-        
-        Comparator<TransactionGroup> comparator = 
-                new MultiComparator<TransactionGroup>(comparatorList);
         
         Collections.sort(list, comparator);
         

@@ -4,24 +4,22 @@ import java.math.BigDecimal;
 
 public class SummaryListItem {
 
-    private long id;
+    private Object underlyingObject;
 	private String label;
 	private BigDecimal amount;
-	private double percentage;
 	
-	public SummaryListItem(long id, String label, BigDecimal amount, double percentage) {
-	    this.setId(id);
-		this.setLabel(label);
-		this.setAmount(amount);
-		this.setPercentage(percentage);
+	public SummaryListItem(Object object, String label, BigDecimal amount) {
+	    setUnderlyingObject(object);
+		setLabel(label);
+		setAmount(amount);
 	}
 
-	public long getId() {
-        return id;
+	public Object getUnderlyingObject() {
+        return underlyingObject;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUnderlyingObject(Object underlyingObject) {
+        this.underlyingObject = underlyingObject;
     }
 
     public String getLabel() {
@@ -38,14 +36,6 @@ public class SummaryListItem {
 
 	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
-	}
-
-	public double getPercentage() {
-		return percentage;
-	}
-
-	public void setPercentage(double percentage) {
-		this.percentage = percentage;
 	}
 	
 }

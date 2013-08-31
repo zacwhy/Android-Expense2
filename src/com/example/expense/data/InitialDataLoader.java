@@ -1,33 +1,17 @@
 package com.example.expense.data;
 
-import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 public final class InitialDataLoader {
     
     private InitialDataLoader() {}
 	
-	public static void initialize(Context context) {
-		new InitialDataLoader(context).initializeData();
-	}
-	
-	private Context mContext;
-	
-	private InitialDataLoader(Context context) {
-		mContext = context;
-	}
-
-	public void initializeData() {
-		ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(mContext);
-		SQLiteDatabase database = databaseHelper.getWritableDatabase();
-		
-        initializeAccounts(database);
-		initializeExpenseCategories(database);
-		
-		databaseHelper.close();
+	public static void initializeData(SQLiteDatabase database) {
+	    initializeAccounts(database);
+        initializeExpenseCategories(database);
 	}
     
-	private void initializeAccounts(SQLiteDatabase database) {
+	private static void initializeAccounts(SQLiteDatabase database) {
 	    AccountsDataSource dataSource = new AccountsDataSource(database);
 
 	    dataSource.deleteAll();
@@ -37,7 +21,7 @@ public final class InitialDataLoader {
 	    }
 	}
 
-	private void initializeExpenseCategories(SQLiteDatabase database) {
+	private static void initializeExpenseCategories(SQLiteDatabase database) {
 		ExpenseCategoriesDataSource dataSource = new ExpenseCategoriesDataSource(database);
 		
 		dataSource.deleteAll();

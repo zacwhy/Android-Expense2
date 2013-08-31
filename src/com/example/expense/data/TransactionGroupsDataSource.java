@@ -87,9 +87,17 @@ public class TransactionGroupsDataSource {
 	public TransactionGroup getTransactionGroupWithTransactionsById(long id) {
 	    TransactionGroup transactionGroup = getTransactionGroupById(id);
 	    
+	    if (transactionGroup == null) {
+	        return null;
+	    }
+	    
 	    TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
 	    List<Transaction> transactions = 
 	            transactionsDataSource.getTransactionsByTransactionGroupId(id);
+	    
+	    for (Transaction transaction : transactions) {
+	        transaction.setTransactionGroup(transactionGroup);
+	    }
 	    
 	    transactionGroup.setTransactions(transactions);
 	    
@@ -207,6 +215,7 @@ public class TransactionGroupsDataSource {
             }
             
             Transaction transaction = cursorToTransaction(cursor);
+            transaction.setTransactionGroup(transactionGroup);
             transactionGroup.getTransactions().add(transaction);
             
             cursor.moveToNext();
