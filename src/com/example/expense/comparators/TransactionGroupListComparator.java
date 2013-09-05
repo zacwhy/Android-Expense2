@@ -1,10 +1,11 @@
-package com.example.expense.models;
+package com.example.expense.comparators;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import com.example.common.MultiComparator;
+import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupListComparator implements Comparator<TransactionGroup> {
     

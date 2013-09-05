@@ -9,11 +9,11 @@ import java.util.Map;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.expense.comparators.TransactionGroupListComparator;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
-import com.example.expense.models.TransactionGroupListComparator;
 
 public final class TransactionGroupHelper {
     

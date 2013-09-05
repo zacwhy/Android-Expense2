@@ -44,9 +44,9 @@ public class SummaryArrayAdapter extends ArrayAdapter<SummaryListItem> {
 		}
 
 		ViewHolder holder = (ViewHolder) rowView.getTag();
-		SummaryListItem summaryListItem = list.get(position);
-		holder.label.setText(summaryListItem.getLabel());
-		holder.amount.setText(FormatHelper.formatMoney(summaryListItem.getAmount()));
+		SummaryListItem listItem = list.get(position);
+		holder.label.setText(listItem.getLabel());
+		holder.amount.setText(FormatHelper.formatMoney(listItem.getAmount()));
 
 		return rowView;
 	}

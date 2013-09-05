@@ -1,4 +1,4 @@
-package com.example.expense.helpers;
+package com.example.expense.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;

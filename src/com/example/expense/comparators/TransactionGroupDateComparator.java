@@ -1,6 +1,8 @@
-package com.example.expense.models;
+package com.example.expense.comparators;
 
 import java.util.Comparator;
+
+import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupDateComparator implements Comparator<TransactionGroup> {
     
