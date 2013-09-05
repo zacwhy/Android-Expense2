@@ -9,7 +9,6 @@ import java.util.Map;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -59,8 +58,8 @@ public final class TransactionGroupHelper {
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
         Map<Long, TransactionGroup> transactionGroups = dataSource.getMapWithTransactions(null, null);
         
-        Map<Long, Account> accounts = Helper.getAccountsMap(db);
-        Map<Long, ExpenseCategory> expenseCategories = Helper.getExpenseCategoriesMap(db);
+        Map<Long, Account> accounts = AccountHelper.getMap(db);
+        Map<Long, ExpenseCategory> expenseCategories = ExpenseCategoryHelper.getMap(db);
 
         databaseHelper.close();
         
@@ -74,8 +73,8 @@ public final class TransactionGroupHelper {
     public static void populateChildren(TransactionGroup transactionGroup,
             List<Account> accounts, List<ExpenseCategory> expenseCategories) {
         
-        Map<Long, Account> accountsMap = Helper.convertToAccountsMap(accounts);
-        Map<Long, ExpenseCategory> expenseCategoriesMap = Helper.convertToExpenseCategoriesMap(expenseCategories);
+        Map<Long, Account> accountsMap = AccountHelper.convertListToMap(accounts);
+        Map<Long, ExpenseCategory> expenseCategoriesMap = ExpenseCategoryHelper.convertListToMap(expenseCategories);
         populateChildren(transactionGroup, accountsMap, expenseCategoriesMap);
     }
 

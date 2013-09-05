@@ -16,11 +16,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.expense.data.AccountHelper;
+import com.example.expense.data.ExpenseCategoryHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.helpers.DateHelper;
-import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
@@ -114,7 +115,7 @@ public class SummaryActivity extends ListActivity {
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
         TransactionGroup transactionGroup = dataSource.getWithTransactionsById(transactionGroupId);
         
-        Map<Long, Account> accountsMap = Helper.getAccountsMap(db);
+        Map<Long, Account> accountsMap = AccountHelper.getMap(db);
         
         databaseHelper.close();
         

@@ -14,8 +14,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.expense.data.AccountHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
-import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
@@ -36,7 +36,7 @@ public class TransactionsActivity extends ListActivity {
         List<Transaction> transactions = getIntent().getParcelableArrayListExtra(EXTRA_TRANSACTIONS);
         ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        mAccountsMap = Helper.getAccountsMap(db);
+        mAccountsMap = AccountHelper.getMap(db);
         databaseHelper.close();
         mListItems = new ArrayList<SummaryListItem>();
         

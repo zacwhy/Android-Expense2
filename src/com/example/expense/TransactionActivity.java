@@ -15,8 +15,8 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import com.example.expense.data.AccountHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
-import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 
 public class TransactionActivity extends Activity {
@@ -46,7 +46,7 @@ public class TransactionActivity extends Activity {
         
         ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        List<Account> accountsList = Helper.getAccounts(db);
+        List<Account> accountsList = AccountHelper.getList(db);
         databaseHelper.close();
         
         ArrayAdapter<Account> arrayAdapter = new ArrayAdapter<Account>(this, android.R.layout.simple_spinner_item, accountsList);
@@ -56,7 +56,7 @@ public class TransactionActivity extends Activity {
         
         if (mAction == ACTION_UPDATE) {
             long toAccountId = intent.getLongExtra(EXTRA_TO_ACCOUNT_ID, 0);
-            Map<Long, Account> accountsMap = Helper.convertToAccountsMap(accountsList);
+            Map<Long, Account> accountsMap = AccountHelper.convertListToMap(accountsList);
             Account toAccount = accountsMap.get(toAccountId);
             int position = arrayAdapter.getPosition(toAccount);
             getSpinnerToAccount().setSelection(position);
