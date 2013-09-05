@@ -30,7 +30,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.expense.SummaryActivity"
+            android:name="com.example.expense.TransactionGroupsActivity"
             android:label="@string/title_activity_summary" >
         </activity>
         <activity

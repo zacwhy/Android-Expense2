@@ -17,7 +17,6 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.example.expense.data.AccountHelper;
-import com.example.expense.data.ExpenseCategoryHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
@@ -28,7 +27,7 @@ import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
 import com.example.expense.models.TransactionGroupListComparator;
 
-public class SummaryActivity extends ListActivity {
+public class TransactionGroupsActivity extends ListActivity {
 
     private List<SummaryListItem> listItems;
     private SummaryArrayAdapter mSummaryArrayAdapter;

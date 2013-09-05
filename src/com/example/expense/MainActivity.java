@@ -12,7 +12,7 @@ public class MainActivity extends Activity {
         
         //quickInsert(this);
         
-        Intent intent = new Intent(this, SummaryActivity.class);
+        Intent intent = new Intent(this, TransactionGroupsActivity.class);
         startActivity(intent);
         
         finish();
