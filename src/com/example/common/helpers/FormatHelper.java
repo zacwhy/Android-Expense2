@@ -1,4 +1,4 @@
-package com.example.expense.helpers;
+package com.example.common.helpers;
 
 import java.text.DecimalFormat;
 

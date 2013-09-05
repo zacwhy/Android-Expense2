@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.example.expense.helpers.FormatHelper;
+import com.example.common.helpers.FormatHelper;
 import com.example.expense.models.SummaryListItem;
 
 public class SummaryArrayAdapter extends ArrayAdapter<SummaryListItem> {

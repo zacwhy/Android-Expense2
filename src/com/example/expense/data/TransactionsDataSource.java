@@ -8,7 +8,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.example.expense.helpers.SqlHelper;
+import com.example.common.helpers.SqlHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;

@@ -16,11 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.common.helpers.DateHelper;
 import com.example.expense.data.AccountHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
-import com.example.expense.helpers.DateHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
@@ -42,7 +42,7 @@ public class TransactionGroupsActivity extends ListActivity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.summary, menu);
+		getMenuInflater().inflate(R.menu.transaction_groups, menu);
 		return true;
 	}
 	

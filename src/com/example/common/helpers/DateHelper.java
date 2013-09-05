@@ -1,4 +1,4 @@
-package com.example.expense.helpers;
+package com.example.common.helpers;
 
 import android.annotation.SuppressLint;
 import java.text.DateFormat;

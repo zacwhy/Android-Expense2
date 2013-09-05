@@ -12,8 +12,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 
-import com.example.expense.helpers.DateHelper;
-import com.example.expense.helpers.SqlHelper;
+import com.example.common.helpers.DateHelper;
+import com.example.common.helpers.SqlHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
