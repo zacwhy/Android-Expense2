@@ -7,12 +7,19 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="18" />
-    
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <provider
+            android:name="com.example.expense.content.AccountProvider"
+            android:authorities="com.zacwhy.expense.provider"
+            android:exported="false"
+            android:multiprocess="true" >
+        </provider>
+
         <activity
             android:name="com.example.expense.MainActivity"
             android:label="@string/app_name" >
@@ -28,21 +35,22 @@
         </activity>
         <activity
             android:name="com.example.expense.EntryActivity"
-            android:label="@string/title_activity_entry"
-            android:theme="@android:style/Theme.Dialog" >
+            android:label="@string/title_activity_entry" >
+
+            <!-- android:theme="@android:style/Theme.Dialog" > -->
+        </activity>
+        <activity
+            android:name="com.example.expense.TransactionsActivity"
+            android:label="@string/title_activity_transactions" >
+        </activity>
+        <activity
+            android:name="com.example.expense.TransactionActivity"
+            android:label="@string/title_activity_transaction" >
         </activity>
         <activity
             android:name="com.example.expense.AccountsActivity"
             android:label="@string/title_activity_accounts" >
         </activity>
-        
-        <provider
-            android:name="com.example.expense.content.AccountProvider"
-            android:authorities="com.zacwhy.expense.provider"
-            android:multiprocess="true"
-            android:exported="false">
-        </provider>
-        
     </application>
 
 </manifest>

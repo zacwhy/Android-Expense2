@@ -17,8 +17,8 @@ import android.view.View;
 import android.widget.ListView;
 
 import com.example.expense.data.ExpenseDatabaseHelper;
+import com.example.expense.data.TransactionGroupHelper;
 import com.example.expense.data.TransactionGroupsDataSource;
-import com.example.expense.data.TransactionHelper;
 import com.example.expense.helpers.DateHelper;
 import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
@@ -66,8 +66,8 @@ public class SummaryActivity extends ListActivity {
         mPosition = position;
         
 	    SummaryListItem listItem = (SummaryListItem) getListView().getItemAtPosition(position);
-	    Transaction transaction = (Transaction) listItem.getUnderlyingObject();
-	    long transactionGroupId = transaction.getTransactionGroup().getId();
+	    TransactionGroup transactionGroup = (TransactionGroup) listItem.getUnderlyingObject();
+	    long transactionGroupId = transactionGroup.getId();
 	    
 	    Intent intent = new Intent(this, EntryActivity.class);
 	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_GROUP_ID, transactionGroupId);
@@ -78,21 +78,25 @@ public class SummaryActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (data != null) {
-            String action = data.getStringExtra(EntryActivity.EXTRA_ACTION);
+            int action = data.getIntExtra(EntryActivity.EXTRA_ACTION, 0);
             
-            if (action.contentEquals(EntryActivity.ACTION_DELETE)) {
-                
-                mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
-                
-            } else if (action.contentEquals(EntryActivity.ACTION_UPDATE)) {
-                
-                refreshUpdate();
-                
-            } else if (action.contentEquals(EntryActivity.ACTION_INSERT)) {
-                
+            switch (action) {
+            
+            case EntryActivity.ACTION_INSERT:
                 loadListView();
+                break;
+                
+            case EntryActivity.ACTION_UPDATE:
+                loadListView();
+                //refreshUpdate();
+                break;
+                
+            case EntryActivity.ACTION_DELETE:
+                mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
+                break;
                 
             }
+
         }
     }
     
@@ -108,7 +112,7 @@ public class SummaryActivity extends ListActivity {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
-        TransactionGroup transactionGroup = dataSource.getTransactionGroupWithTransactionsById(transactionGroupId);
+        TransactionGroup transactionGroup = dataSource.getWithTransactionsById(transactionGroupId);
         
         Map<Long, Account> accountsMap = Helper.getAccountsMap(db);
         
@@ -126,7 +130,7 @@ public class SummaryActivity extends ListActivity {
         Account toAccount = accountsMap.get(toAccountId);
         transaction.setToAccount(toAccount);
         
-        String label = getLabel(transactionGroup, transaction);        
+        String label = getLabel(transactionGroup);
         
         SummaryListItem newListItem = new SummaryListItem(transaction, label, transaction.getAmount());
         
@@ -159,7 +163,7 @@ public class SummaryActivity extends ListActivity {
     }
     
 	private void loadListView() {
-        List<TransactionGroup> list = TransactionHelper.getTransactionGroups(this);
+        List<TransactionGroup> list = TransactionGroupHelper.getSortedList(this);
         listItems = getListItems(list);
 	    mSummaryArrayAdapter = new SummaryArrayAdapter(this, listItems);
 		setListAdapter(mSummaryArrayAdapter);
@@ -169,33 +173,46 @@ public class SummaryActivity extends ListActivity {
 	    List<SummaryListItem> items = new ArrayList<SummaryListItem>();
 	    
 	    for (TransactionGroup transactionGroup : transactionGroups) {
+	        BigDecimal totalAmount = BigDecimal.ZERO;
+	        
 	        for (Transaction transaction : transactionGroup.getTransactions()) {
-	            String label = getLabel(transactionGroup, transaction);
-	            BigDecimal amount = transaction.getAmount();
-	            SummaryListItem item = new SummaryListItem(transaction, label, amount);
-	            items.add(item);
+	            totalAmount = totalAmount.add(transaction.getAmount());
 	        }
+	        
+	        String label = getLabel(transactionGroup);
+	        SummaryListItem item = new SummaryListItem(transactionGroup, label, totalAmount);
+            items.add(item);
 	    }
 	    
 	    return items;
 	}
 	
-	private static String getLabel(TransactionGroup transactionGroup, Transaction transaction) {
-	    return DateHelper.getDateWithDayOfWeekString(transactionGroup.getDate()) + " " + 
-	            transactionGroup.getSequence() + "." + transaction.getSequence() + " " +
-	            getDescription(transactionGroup, transaction);
-	}
+	private static String getLabel(TransactionGroup transactionGroup) {
+        return DateHelper.getDateWithDayOfWeekString(transactionGroup.getDate()) + " " + 
+                transactionGroup.getSequence() + " " + 
+                getDescription(transactionGroup);
+    }
 	
-	private static String getDescription(TransactionGroup transactionGroup, 
-	        Transaction transaction) {
+	private static String getDescription(TransactionGroup transactionGroup) {
+	    if (transactionGroup.getTransactions().size() == 1) {
+	        Transaction transaction = transactionGroup.getTransactions().get(0);
+	        
+	        if (transaction.getDescription().isEmpty()) {
+	            String fromAccount = transactionGroup.getFromAccount().getName();
+	            String toAccount = transaction.getToAccount().getName();
+	            return fromAccount + " to " + toAccount;
+	        }
+	        
+	        return transaction.getDescription();
+	    }
 	    
-	    if (transaction.getDescription().isEmpty()) {
-	        String fromAccount = transactionGroup.getFromAccount().getName();
-	        String toAccount = transaction.getToAccount().getName();
-            return fromAccount + " to " + toAccount;
-        }
+	    if (transactionGroup.getTransactions().size() > 1) {
+	        return transactionGroup.getFromAccount().getName() + " " +
+	                transactionGroup.getExpenseCategory().getTitle() + " " +
+	                "(" + transactionGroup.getTransactions().size() + ")";
+	    }
 	    
-	    return transaction.getDescription();
+	    return "NO TRANSACTIONS?";
 	}
 
 }

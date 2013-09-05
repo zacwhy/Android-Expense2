@@ -2,7 +2,10 @@ package com.example.expense.models;
 
 import java.math.BigDecimal;
 
-public class Transaction {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Transaction implements Parcelable {
 
     private long id;
     private TransactionGroup transactionGroup;
@@ -14,7 +17,14 @@ public class Transaction {
     public Transaction(long id) {
         setId(id);
     }
-    
+
+    public Transaction(Parcel in) {
+        setId(in.readLong());
+        setDescription(in.readString());
+        setAmount(new BigDecimal(in.readString()));
+        setToAccount(new Account(in.readLong()));
+    }
+
     public Transaction() {
         
     }
@@ -65,6 +75,34 @@ public class Transaction {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+    
+    public static final Parcelable.Creator<Transaction> CREATOR =
+            new Parcelable.Creator<Transaction>() {
+
+        @Override
+        public Transaction createFromParcel(Parcel source) {
+            return new Transaction(source);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(getId());
+        dest.writeString(getDescription());
+        dest.writeString(getAmount().toPlainString());
+        dest.writeLong(getToAccount().getId());
     }
 
 }

@@ -1,19 +1,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/action_multiple_transactions"
+        android:id="@+id/action_delete"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/action_multiple_transactions"/>
+        android:title="@string/action_delete"/>
     <item
         android:id="@+id/action_ok"
         android:orderInCategory="100"
         android:showAsAction="always"
         android:title="@string/action_ok"/>
-    <item
-        android:id="@+id/action_delete"
-        android:orderInCategory="100"
-        android:showAsAction="never"
-        android:title="@string/action_delete"/>
-
+    
 </menu>

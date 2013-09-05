@@ -10,7 +10,6 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        //InitialDataLoader.initialize(this);
         //quickInsert(this);
         
         Intent intent = new Intent(this, SummaryActivity.class);

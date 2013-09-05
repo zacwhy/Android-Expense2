@@ -21,42 +21,91 @@ import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
 	
-	private static final String QUOTED_TABLE_NAME = 
-	        SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
+	private static final String QUOTED_TABLE_NAME = SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
 
-	private SQLiteDatabase database;
+	private SQLiteDatabase mDatabase;
 	
 	public TransactionGroupsDataSource(SQLiteDatabase database) {
-		this.database = database;
+		mDatabase = database;
 	}
 	
 	public long insertLast(TransactionGroup transactionGroup) {
         int sequence = getMaxSequence(transactionGroup.getDate()) + 1;
         transactionGroup.setSequence(sequence);
         
-        long transactionGroupId = simpleInsert(transactionGroup);
+        long transactionGroupId = insert(transactionGroup);
+        transactionGroup.setId(transactionGroupId);
         
-        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-        transactionsDataSource.insert(transactionGroup.getTransactions(), transactionGroupId);
+        for (Transaction transaction : transactionGroup.getTransactions()) {
+            transaction.setTransactionGroup(transactionGroup);
+        }
+        
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(mDatabase);
+        transactionsDataSource.insert(transactionGroup.getTransactions());
         
         return transactionGroupId;
 	}
 	
-	private long simpleInsert(TransactionGroup transactionGroup) {
+	private long insert(TransactionGroup transactionGroup) {
 		ContentValues values = new ContentValues();
 		
-		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, 
-		        transactionGroup.getDate().getTimeInMillis());
-		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE, 
-		        transactionGroup.getSequence());
-		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, 
-		        transactionGroup.getExpenseCategory().getId());
-        values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, 
-                transactionGroup.getFromAccount().getId());
+		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, transactionGroup.getDate().getTimeInMillis());
+		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_SEQUENCE, transactionGroup.getSequence());
+		values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, transactionGroup.getExpenseCategory().getId());
+        values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, transactionGroup.getFromAccount().getId());
 
-		long newRowId = database.insert(QUOTED_TABLE_NAME, null, values);
+		long newRowId = mDatabase.insert(QUOTED_TABLE_NAME, null, values);
 		return newRowId;
 	}
+	
+	public int update(TransactionGroup transactionGroup) {
+	    TransactionGroup oldValue = getWithTransactionsById(transactionGroup.getId());
+	    return update(transactionGroup, oldValue);
+	}
+	
+	public int update(TransactionGroup newValue, TransactionGroup oldValue) {
+	    int rowsAffected = 0;
+	    
+        ContentValues values = getUpdateContentValues(newValue, oldValue);
+        
+        if (values.size() > 0) {
+            rowsAffected = updateById(newValue.getId(), values);
+        }
+        
+        Map<Long, Transaction> newTransactionsMap = TransactionHelper.convertToMap(newValue.getTransactions());
+        
+        List<Long> transactionIdsToDelete = new ArrayList<Long>();
+        
+        for (Transaction transaction : oldValue.getTransactions()) {
+            if (!newTransactionsMap.containsKey(transaction.getId())){
+                transactionIdsToDelete.add(transaction.getId());
+            }
+        }
+        
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(mDatabase);
+        transactionsDataSource.deleteByIds(transactionIdsToDelete);
+        transactionsDataSource.insertOrUpdate(newValue.getTransactions());
+        
+        return rowsAffected;
+    }
+	
+	private ContentValues getUpdateContentValues(TransactionGroup newValue, TransactionGroup oldValue) {
+        ContentValues values = new ContentValues();
+
+        if (newValue.getDate().compareTo(oldValue.getDate()) != 0) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE, newValue.getDate().getTimeInMillis());
+        }
+        
+        if (newValue.getExpenseCategory().getId() != oldValue.getExpenseCategory().getId()) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID, newValue.getExpenseCategory().getId());
+        }
+        
+        if (newValue.getFromAccount().getId() != oldValue.getFromAccount().getId()) {
+            values.put(ExpenseContract.TransactionGroup.COLUMN_NAME_FROM_ACCOUNT_ID, newValue.getFromAccount().getId());
+        }
+        
+        return values;
+    }
 	
 	public int updateById(long id, ContentValues values) {
 	    String whereClause = ExpenseContract.TransactionGroup._ID + " = ?";
@@ -65,35 +114,34 @@ public class TransactionGroupsDataSource {
 	}
 	
 	private int update(ContentValues values, String whereClause, String[] whereArgs) {
-	    int rowsAffected = database.update(QUOTED_TABLE_NAME, values, whereClause, whereArgs);
+	    int rowsAffected = mDatabase.update(QUOTED_TABLE_NAME, values, whereClause, whereArgs);
 	    return rowsAffected;
 	}
 	
-	public int deleteByTransactionGroupId(long transactionGroupId) {
+	public int deleteById(long id) {
 	    // Delete child records first
-        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-        transactionsDataSource.deleteByTransactionGroupId(transactionGroupId);
+        TransactionsDataSource transactionsDataSource = new TransactionsDataSource(mDatabase);
+        transactionsDataSource.deleteByTransactionGroupId(id);
         
         String whereClause = ExpenseContract.TransactionGroup._ID + " = ?";
-        String[] whereArgs = new String[] { Long.toString(transactionGroupId) };
+        String[] whereArgs = new String[] { Long.toString(id) };
         return delete(whereClause, whereArgs);
     }
 	
 	private int delete(String whereClause, String[] whereArgs) {
-	    int rowsAffected = database.delete(QUOTED_TABLE_NAME, whereClause, whereArgs);
+	    int rowsAffected = mDatabase.delete(QUOTED_TABLE_NAME, whereClause, whereArgs);
         return rowsAffected;
 	}
 	
-	public TransactionGroup getTransactionGroupWithTransactionsById(long id) {
-	    TransactionGroup transactionGroup = getTransactionGroupById(id);
+	public TransactionGroup getWithTransactionsById(long id) {
+	    TransactionGroup transactionGroup = getById(id);
 	    
 	    if (transactionGroup == null) {
 	        return null;
 	    }
 	    
-	    TransactionsDataSource transactionsDataSource = new TransactionsDataSource(database);
-	    List<Transaction> transactions = 
-	            transactionsDataSource.getTransactionsByTransactionGroupId(id);
+	    TransactionsDataSource transactionsDataSource = new TransactionsDataSource(mDatabase);
+	    List<Transaction> transactions = transactionsDataSource.getListByTransactionGroupId(id);
 	    
 	    for (Transaction transaction : transactions) {
 	        transaction.setTransactionGroup(transactionGroup);
@@ -104,11 +152,11 @@ public class TransactionGroupsDataSource {
 	    return transactionGroup;
 	}
 	
-	public TransactionGroup getTransactionGroupById(long id) {
+	public TransactionGroup getById(long id) {
         String selection = ExpenseContract.TransactionGroup._ID + " = ?";
         String[] selectionArgs = { Long.toString(id) };
         
-        List<TransactionGroup> items = get(selection, selectionArgs);
+        List<TransactionGroup> items = getList(selection, selectionArgs);
         
         if (items.size() == 0) {
             return null;
@@ -117,7 +165,7 @@ public class TransactionGroupsDataSource {
         return items.get(0);
 	}
 	
-	private List<TransactionGroup> get(String selection, String[] selectionArgs) {
+	private List<TransactionGroup> getList(String selection, String[] selectionArgs) {
 	    String[] columns = {
 	            ExpenseContract.TransactionGroup._ID,
 	            ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
@@ -129,13 +177,10 @@ public class TransactionGroupsDataSource {
 	    String groupBy = null;
 	    String having = null;
 	    String orderBy = null;
-
-	    Cursor cursor = database.query(QUOTED_TABLE_NAME, columns, selection, selectionArgs, groupBy, 
-	            having, orderBy);
-	    
+	    Cursor cursor = mDatabase.query(QUOTED_TABLE_NAME, columns, selection, selectionArgs, groupBy, having, orderBy);
 	    List<TransactionGroup> items = new ArrayList<TransactionGroup>();
-	    
 	    cursor.moveToFirst();
+
 	    while (!cursor.isAfterLast()) {
 	        TransactionGroup item = cursorToTransactionGroup(cursor);
 	        items.add(item);
@@ -164,9 +209,7 @@ public class TransactionGroupsDataSource {
 	    return transactionGroup;
 	}
 	
-	public Map<Long, TransactionGroup> getTransactionGroupsWithTransactions(String selection, 
-            String[] selectionArgs) {
-        
+	public Map<Long, TransactionGroup> getMapWithTransactions(String selection, String[] selectionArgs) {
         SQLiteQueryBuilder sqliteQueryBuilder = new SQLiteQueryBuilder();
         
         String inTables = SqlHelper.format("%s LEFT OUTER JOIN %s ON %s.%s = %s.%s",
@@ -197,7 +240,7 @@ public class TransactionGroupsDataSource {
         String having = null;
         String sortOrder = null;
         
-        Cursor cursor = sqliteQueryBuilder.query(database, projectionIn, selection, selectionArgs, 
+        Cursor cursor = sqliteQueryBuilder.query(mDatabase, projectionIn, selection, selectionArgs, 
                 groupBy, having, sortOrder);
         
         Map<Long, TransactionGroup> transactionGroupsMap = new HashMap<Long, TransactionGroup>();
@@ -269,10 +312,9 @@ public class TransactionGroupsDataSource {
         
         Calendar universalTimeCalendar = DateHelper.getUniversalTime(calendar);
         String dateTimeString = DateHelper.getSqlDateTimeString(universalTimeCalendar);
-
-	    Cursor cursor = database.rawQuery(sql, new String[] { dateTimeString, dateTimeString }); 
-	    
+	    Cursor cursor = mDatabase.rawQuery(sql, new String[] { dateTimeString, dateTimeString }); 
 	    cursor.moveToFirst();
+	    
         while (!cursor.isAfterLast()) {
             sequence = cursor.getInt(0);
             cursor.moveToNext();
@@ -280,7 +322,6 @@ public class TransactionGroupsDataSource {
         
         // Make sure to close the cursor
         cursor.close();
-	    
 	    return sequence;
 	}
 
