@@ -3,15 +3,19 @@ package com.example.expense;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.expense.data.ExpenseDatabaseHelper;
+import com.example.expense.helpers.Helper;
 import com.example.expense.models.Account;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.Transaction;
@@ -20,6 +24,7 @@ public class TransactionsActivity extends ListActivity {
 
     public static final String EXTRA_TRANSACTIONS = "com.example.expense.TRANSACTIONS";
     
+    private Map<Long, Account> mAccountsMap;
     private List<SummaryListItem> mListItems;
     private SummaryArrayAdapter mSummaryArrayAdapter;
     private int mPosition;
@@ -28,12 +33,20 @@ public class TransactionsActivity extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         
-        Intent intent = getIntent();
-        List<Transaction> transactions = intent.getParcelableArrayListExtra(EXTRA_TRANSACTIONS);
+        List<Transaction> transactions = getIntent().getParcelableArrayListExtra(EXTRA_TRANSACTIONS);
+        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        mAccountsMap = Helper.getAccountsMap(db);
+        databaseHelper.close();
         mListItems = new ArrayList<SummaryListItem>();
         
         for (Transaction transaction : transactions) {
-            SummaryListItem listItem = new SummaryListItem(transaction, transaction.getDescription(), transaction.getAmount());
+            long toAccountId = transaction.getToAccount().getId();
+            Account toAccount = mAccountsMap.get(toAccountId);
+            transaction.setToAccount(toAccount);
+            
+            String label = getLabel(transaction);
+            SummaryListItem listItem = new SummaryListItem(transaction, label, transaction.getAmount());
             mListItems.add(listItem);
         }
         
@@ -99,6 +112,7 @@ public class TransactionsActivity extends ListActivity {
 
         if (resultCode == RESULT_OK) {
             onActivityResultPositive(data);
+            mSummaryArrayAdapter.notifyDataSetChanged();
         }
     }
 
@@ -108,12 +122,11 @@ public class TransactionsActivity extends ListActivity {
         if (action == TransactionActivity.ACTION_DELETE) {
             SummaryListItem listItem = mListItems.get(mPosition);
             mListItems.remove(listItem);
-            mSummaryArrayAdapter.notifyDataSetChanged();
             return;
         }
 
-        long toAccountId = data.getLongExtra(TransactionActivity.EXTRA_TO_ACCOUNT_ID, -1);
-        Account toAccount = new Account(toAccountId);
+        long toAccountId = data.getLongExtra(TransactionActivity.EXTRA_TO_ACCOUNT_ID, 0);
+        Account toAccount = mAccountsMap.get(toAccountId);
         BigDecimal amount = (BigDecimal) data.getSerializableExtra(TransactionActivity.EXTRA_AMOUNT);
         String description = data.getStringExtra(TransactionActivity.EXTRA_DESCRIPTION);
 
@@ -123,7 +136,8 @@ public class TransactionsActivity extends ListActivity {
             transaction.setAmount(amount);
             transaction.setDescription(description);
 
-            SummaryListItem listItem = new SummaryListItem(transaction, description, amount);
+            String label = getLabel(transaction);
+            SummaryListItem listItem = new SummaryListItem(transaction, label, amount);
             mListItems.add(listItem);
         } else if (action == TransactionActivity.ACTION_UPDATE) {
             SummaryListItem listItem = mListItems.get(mPosition);
@@ -133,12 +147,20 @@ public class TransactionsActivity extends ListActivity {
             transaction.setAmount(amount);
             transaction.setDescription(description);
 
+            String label = getLabel(transaction);
+
             listItem.setUnderlyingObject(transaction);
-            listItem.setLabel(description);
+            listItem.setLabel(label);
             listItem.setAmount(amount);
         }
-
-        mSummaryArrayAdapter.notifyDataSetChanged();
+    }
+    
+    private String getLabel(Transaction transaction) {
+        if (transaction.getDescription().isEmpty()) {
+            return "To Account " + transaction.getToAccount().getName();
+        }
+        
+        return transaction.getDescription();
     }
 
 }

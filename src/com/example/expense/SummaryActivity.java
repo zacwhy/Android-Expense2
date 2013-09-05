@@ -207,9 +207,10 @@ public class SummaryActivity extends ListActivity {
 	    }
 	    
 	    if (transactionGroup.getTransactions().size() > 1) {
-	        return transactionGroup.getFromAccount().getName() + " " +
-	                transactionGroup.getExpenseCategory().getTitle() + " " +
-	                "(" + transactionGroup.getTransactions().size() + ")";
+	        String expenseCategory = transactionGroup.getExpenseCategory().getTitle();
+	        String fromAccount = transactionGroup.getFromAccount().getName();
+	        int transactionCount = transactionGroup.getTransactions().size();
+	        return String.format("%s by %s (%s)", expenseCategory, fromAccount, transactionCount);
 	    }
 	    
 	    return "NO TRANSACTIONS?";
