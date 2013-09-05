@@ -51,7 +51,7 @@ public class SummaryActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	    case R.id.action_add:
-	        Intent intent = new Intent(this, EntryActivity.class);
+	        Intent intent = new Intent(this, TransactionGroupActivity.class);
 	        startActivityForResult(intent, 0);
 	        return true;
 
@@ -70,8 +70,8 @@ public class SummaryActivity extends ListActivity {
 	    TransactionGroup transactionGroup = (TransactionGroup) listItem.getUnderlyingObject();
 	    long transactionGroupId = transactionGroup.getId();
 	    
-	    Intent intent = new Intent(this, EntryActivity.class);
-	    intent.putExtra(EntryActivity.EXTRA_TRANSACTION_GROUP_ID, transactionGroupId);
+	    Intent intent = new Intent(this, TransactionGroupActivity.class);
+	    intent.putExtra(TransactionGroupActivity.EXTRA_TRANSACTION_GROUP_ID, transactionGroupId);
 	    startActivityForResult(intent, 0);
     }
 	
@@ -79,20 +79,20 @@ public class SummaryActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (data != null) {
-            int action = data.getIntExtra(EntryActivity.EXTRA_ACTION, 0);
+            int action = data.getIntExtra(TransactionGroupActivity.EXTRA_ACTION, 0);
             
             switch (action) {
             
-            case EntryActivity.ACTION_INSERT:
+            case TransactionGroupActivity.ACTION_INSERT:
                 loadListView();
                 break;
                 
-            case EntryActivity.ACTION_UPDATE:
+            case TransactionGroupActivity.ACTION_UPDATE:
                 loadListView();
                 //refreshUpdate();
                 break;
                 
-            case EntryActivity.ACTION_DELETE:
+            case TransactionGroupActivity.ACTION_DELETE:
                 mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
                 break;
                 

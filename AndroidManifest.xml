@@ -34,7 +34,7 @@
             android:label="@string/title_activity_summary" >
         </activity>
         <activity
-            android:name="com.example.expense.EntryActivity"
+            android:name="com.example.expense.TransactionGroupActivity"
             android:label="@string/title_activity_entry" >
 
             <!-- android:theme="@android:style/Theme.Dialog" > -->
