@@ -1,43 +1,36 @@
 package com.example.expense;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.example.common.helpers.DateHelper;
-import com.example.expense.comparators.TransactionGroupListComparator;
-import com.example.expense.data.AccountHelper;
-import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
-import com.example.expense.data.TransactionGroupsDataSource;
-import com.example.expense.models.Account;
+import com.example.expense.helpers.SummaryListItemHelper;
 import com.example.expense.models.SummaryListItem;
-import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsActivity extends ListActivity {
 
-    private List<SummaryListItem> listItems;
+    private List<SummaryListItem> mListItems;
     private SummaryArrayAdapter mSummaryArrayAdapter;
     private int mPosition;
     
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		loadListView();
-	}
+
+        List<TransactionGroup> transactionGroupList = TransactionGroupHelper.getList(this);
+        mListItems = SummaryListItemHelper.getListItems(transactionGroupList);
+        SummaryListItemHelper.sort(mListItems);
+        mSummaryArrayAdapter = new SummaryArrayAdapter(this, mListItems);
+        setListAdapter(mSummaryArrayAdapter);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,137 +76,37 @@ public class TransactionGroupsActivity extends ListActivity {
             switch (action) {
             
             case TransactionGroupActivity.ACTION_INSERT:
-                loadListView();
+                long id = data.getLongExtra(TransactionGroupActivity.EXTRA_TRANSACTION_GROUP_ID, 0);
+                refreshUpdate(id);
                 break;
                 
             case TransactionGroupActivity.ACTION_UPDATE:
-                loadListView();
-                //refreshUpdate();
+                refreshUpdate(0);
                 break;
                 
             case TransactionGroupActivity.ACTION_DELETE:
-                mSummaryArrayAdapter.remove(mSummaryArrayAdapter.getItem(mPosition));
+                mListItems.remove(mPosition);
                 break;
                 
             }
-
+            
+            mSummaryArrayAdapter.notifyDataSetChanged();
         }
     }
     
-    private void refreshUpdate() {
-        SummaryListItem listItem = mSummaryArrayAdapter.getItem(mPosition);
+    private void refreshUpdate(long id) {
+        if (id == 0) {
+            SummaryListItem oldListItem = mListItems.get(mPosition);
+            TransactionGroup oldTransactionGroup = (TransactionGroup) oldListItem.getUnderlyingObject();
+            id = oldTransactionGroup.getId();
+            mListItems.remove(oldListItem);
+        }
         
-        Transaction transaction2 = (Transaction) listItem.getUnderlyingObject();
-        long transactionGroupId = transaction2.getTransactionGroup().getId();
+        TransactionGroup newTransactionGroup = TransactionGroupHelper.getById(this, id, true, true, false);
+        SummaryListItem newListItem = SummaryListItemHelper.getListItem(newTransactionGroup);
+        mListItems.add(newListItem);
         
-        
-        ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
-        
-        SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        
-        TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
-        TransactionGroup transactionGroup = dataSource.getWithTransactionsById(transactionGroupId);
-        
-        Map<Long, Account> accountsMap = AccountHelper.getMap(db);
-        
-        databaseHelper.close();
-        
-        
-        long fromAccountId = transactionGroup.getFromAccount().getId();
-        Account fromAccount = accountsMap.get(fromAccountId);
-        transactionGroup.setFromAccount(fromAccount);
-        
-        
-        Transaction transaction = transactionGroup.getTransactions().get(0);
-        
-        long toAccountId = transaction.getToAccount().getId();
-        Account toAccount = accountsMap.get(toAccountId);
-        transaction.setToAccount(toAccount);
-        
-        String label = getLabel(transactionGroup);
-        
-        SummaryListItem newListItem = new SummaryListItem(transaction, label, transaction.getAmount());
-        
-        listItems.remove(mPosition);
-        listItems.add(newListItem);
-        
-        sortListItems();
-        
-        mSummaryArrayAdapter.notifyDataSetChanged();
+        SummaryListItemHelper.sort(mListItems);
     }
-    
-    private void sortListItems() {
-        final Comparator<TransactionGroup> comparator = new TransactionGroupListComparator(true);
-        
-        Collections.sort(listItems, new Comparator<SummaryListItem>() {
-
-            @Override
-            public int compare(SummaryListItem lhs, SummaryListItem rhs) {
-                
-                Transaction t1 = (Transaction) lhs.getUnderlyingObject();
-                Transaction t2 = (Transaction) rhs.getUnderlyingObject();
-                
-                TransactionGroup g1 = t1.getTransactionGroup();
-                TransactionGroup g2 = t2.getTransactionGroup();
-                
-                return comparator.compare(g1, g2);
-            }
-            
-        });
-    }
-    
-	private void loadListView() {
-        List<TransactionGroup> list = TransactionGroupHelper.getSortedList(this);
-        listItems = getListItems(list);
-	    mSummaryArrayAdapter = new SummaryArrayAdapter(this, listItems);
-		setListAdapter(mSummaryArrayAdapter);
-	}
-	
-	private List<SummaryListItem> getListItems(List<TransactionGroup> transactionGroups) {
-	    List<SummaryListItem> items = new ArrayList<SummaryListItem>();
-	    
-	    for (TransactionGroup transactionGroup : transactionGroups) {
-	        BigDecimal totalAmount = BigDecimal.ZERO;
-	        
-	        for (Transaction transaction : transactionGroup.getTransactions()) {
-	            totalAmount = totalAmount.add(transaction.getAmount());
-	        }
-	        
-	        String label = getLabel(transactionGroup);
-	        SummaryListItem item = new SummaryListItem(transactionGroup, label, totalAmount);
-            items.add(item);
-	    }
-	    
-	    return items;
-	}
-	
-	private static String getLabel(TransactionGroup transactionGroup) {
-        return DateHelper.getDateWithDayOfWeekString(transactionGroup.getDate()) + " " + 
-                transactionGroup.getSequence() + " " + 
-                getDescription(transactionGroup);
-    }
-	
-	private static String getDescription(TransactionGroup transactionGroup) {
-	    if (transactionGroup.getTransactions().size() == 1) {
-	        Transaction transaction = transactionGroup.getTransactions().get(0);
-	        
-	        if (transaction.getDescription().isEmpty()) {
-	            String fromAccount = transactionGroup.getFromAccount().getName();
-	            String toAccount = transaction.getToAccount().getName();
-	            return fromAccount + " to " + toAccount;
-	        }
-	        
-	        return transaction.getDescription();
-	    }
-	    
-	    if (transactionGroup.getTransactions().size() > 1) {
-	        String expenseCategory = transactionGroup.getExpenseCategory().getTitle();
-	        String fromAccount = transactionGroup.getFromAccount().getName();
-	        int transactionCount = transactionGroup.getTransactions().size();
-	        return String.format("%s by %s (%s)", expenseCategory, fromAccount, transactionCount);
-	    }
-	    
-	    return "NO TRANSACTIONS?";
-	}
 
 }

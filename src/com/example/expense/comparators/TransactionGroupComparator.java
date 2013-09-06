@@ -7,11 +7,11 @@ import java.util.List;
 import com.example.common.MultiComparator;
 import com.example.expense.models.TransactionGroup;
 
-public class TransactionGroupListComparator implements Comparator<TransactionGroup> {
+public class TransactionGroupComparator implements Comparator<TransactionGroup> {
     
     private boolean descending;
     
-    public TransactionGroupListComparator(boolean descending) {
+    public TransactionGroupComparator(boolean descending) {
         this.descending = descending;
     }
 

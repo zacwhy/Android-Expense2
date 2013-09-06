@@ -250,9 +250,11 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
 	            return;
 	        }
 	        
-	        insertTransactionGroup();
-	        finishWithAction(ACTION_INSERT);
+	        long id = insertTransactionGroup();
+	        finishWithAction(ACTION_INSERT, id);
 	    } else {
+	        fillTransactionGroup(mTransactionGroup);
+	        
 	        if (isTransactionFieldsVisible()) {
 	            if (!isInputTransactionValid()) {
 	                return;
@@ -263,11 +265,11 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
             }
 	        
 	        TransactionGroupHelper.update(this, mTransactionGroup);
-	        finishWithAction(ACTION_UPDATE);
+	        finishWithAction(ACTION_UPDATE, mTransactionGroupId);
 	    }
 	}
     
-    private void insertTransactionGroup() {
+    private long insertTransactionGroup() {
         ExpenseCategory expenseCategory = (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
         Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
         
@@ -280,17 +282,19 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
             mTransactionGroup.getTransactions().add(transaction);
         }
         
-        TransactionGroupHelper.insert(this, mTransactionGroup);
+        long id = TransactionGroupHelper.insert(this, mTransactionGroup);
+        return id;
     }
 
     private void onClickDelete() {
         TransactionGroupHelper.deleteById(this, mTransactionGroup.getId());
-        finishWithAction(ACTION_DELETE);
+        finishWithAction(ACTION_DELETE, mTransactionGroupId);
     }
     
-    private void finishWithAction(int action) {
+    private void finishWithAction(int action, long id) {
         Intent intent = new Intent();
         intent.putExtra(EXTRA_ACTION, action);
+        intent.putExtra(EXTRA_TRANSACTION_GROUP_ID, id);
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -307,6 +311,15 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
         Transaction transaction = new Transaction();
         fillTransaction(transaction);
         return transaction;
+    }
+    
+    private void fillTransactionGroup(TransactionGroup transactionGroup) {
+        ExpenseCategory expenseCategory = (ExpenseCategory) getSpinnerExpenseCategory().getSelectedItem();
+        Account fromAccount = (Account) getSpinnerFromAccount().getSelectedItem();
+        
+        transactionGroup.setDate(mCalendar);
+        transactionGroup.setExpenseCategory(expenseCategory);
+        transactionGroup.setFromAccount(fromAccount);
     }
     
     private void fillTransaction(Transaction transaction) {
