@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 public final class SqlHelper {
     
+    private SqlHelper() {}
+    
     public static String format(String format, String... args) {
         ArrayList<String> list = new ArrayList<String>();
         

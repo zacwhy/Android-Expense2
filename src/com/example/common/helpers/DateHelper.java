@@ -9,6 +9,8 @@ import java.util.GregorianCalendar;
 @SuppressLint("SimpleDateFormat")
 public final class DateHelper {
 
+    private DateHelper() {}
+    
     //
     // Display
     //
