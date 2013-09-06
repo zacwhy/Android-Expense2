@@ -72,19 +72,34 @@ public class TransactionGroupsDataSource {
             rowsAffected = updateById(newValue.getId(), values);
         }
         
+        List<Transaction> transactionsToInsert = new ArrayList<Transaction>();
+        List<Transaction> transactionsToUpdate = new ArrayList<Transaction>();
+        List<Transaction> transactionsToDelete = new ArrayList<Transaction>();
+        Map<Long, Transaction> oldTransactionsMap = TransactionHelper.convertToMap(oldValue.getTransactions());
         Map<Long, Transaction> newTransactionsMap = TransactionHelper.convertToMap(newValue.getTransactions());
-        
-        List<Long> transactionIdsToDelete = new ArrayList<Long>();
         
         for (Transaction transaction : oldValue.getTransactions()) {
             if (!newTransactionsMap.containsKey(transaction.getId())){
-                transactionIdsToDelete.add(transaction.getId());
+                transactionsToDelete.add(transaction);
+            }
+        }
+        
+        for (Transaction transaction : newValue.getTransactions()) {
+            if (transaction.getId() > 0){
+                transactionsToUpdate.add(transaction);
+            } else {
+                transactionsToInsert.add(transaction);
             }
         }
         
         TransactionsDataSource transactionsDataSource = new TransactionsDataSource(mDatabase);
-        transactionsDataSource.deleteByIds(transactionIdsToDelete);
-        transactionsDataSource.insertOrUpdate(newValue.getTransactions());
+        transactionsDataSource.delete(transactionsToDelete);
+        transactionsDataSource.insert(transactionsToInsert);
+
+        for (Transaction transaction : transactionsToUpdate) {
+            Transaction oldTransaction = oldTransactionsMap.get(transaction.getId());
+            transactionsDataSource.update(transaction, oldTransaction);
+        }
         
         return rowsAffected;
     }

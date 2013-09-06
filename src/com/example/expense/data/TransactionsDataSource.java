@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.example.common.helpers.SqlHelper;
+import com.example.common.helpers.StringHelper;
 import com.example.expense.models.Account;
 import com.example.expense.models.Transaction;
 import com.example.expense.models.TransactionGroup;
@@ -45,34 +46,6 @@ public class TransactionsDataSource {
 
 		long newRowId = mDatabase.insert(QUOTED_TABLE_NAME, null, values);
 		return newRowId;
-	}
-	
-	public int insertOrUpdate(List<Transaction> transactions) {
-	    int rowsAffected = 0;
-	    
-	    for (Transaction transaction : transactions) {
-	        rowsAffected += insertOrUpdate(transaction);
-        }
-	    
-	    return rowsAffected;
-	}
-	
-	private int insertOrUpdate(Transaction transaction) {
-	    Transaction oldValue = getById(transaction.getId());
-	    return insertOrUpdate(transaction, oldValue);
-	}
-	
-	private int insertOrUpdate(Transaction newValue, Transaction oldValue) {
-	    int rowsAffected;
-	    
-	    if (oldValue == null) {
-            insert(newValue);
-            rowsAffected = 1;
-        } else {
-            rowsAffected = update(newValue, oldValue);
-        }
-	    
-	    return rowsAffected;
 	}
 	
 	public int update(Transaction newValue, Transaction oldValue) {
@@ -116,22 +89,28 @@ public class TransactionsDataSource {
         return rowsAffected;
     }
     
-    // TODO
-    public int deleteByIds(List<Long> ids) {
-        int result = 0;
+    public int delete(List<Transaction> transactions) {
+        List<String> ids = new ArrayList<String>();
         
-        for (Long id : ids) {
-            result += deleteById(id);
+        for (Transaction transaction : transactions) {
+            ids.add(Long.toString(transaction.getId()));
         }
         
-        return result;
-    }
-	
-	public int deleteById(long id) {
-	    String whereClause = ExpenseContract.Transaction._ID + " = ?";
-        String[] whereArgs = new String[] { Long.toString(id) };
+        String s = ids.size() > 1 ? StringHelper.repeat(", ?", ids.size() - 1) : "";
+        String whereClause = String.format("%s IN (?%s)", ExpenseContract.Transaction._ID, s);
+        String[] whereArgs = ids.toArray(new String[ids.size()]);
         return delete(whereClause, whereArgs);
-	}
+    }
+    
+//    public int delete(Transaction transaction) {
+//        return deleteById(transaction.getId());
+//    }
+	
+//    public int deleteById(long id) {
+//        String whereClause = ExpenseContract.Transaction._ID + " = ?";
+//        String[] whereArgs = new String[] { Long.toString(id) };
+//        return delete(whereClause, whereArgs);
+//    }
 	
 	public int deleteByTransactionGroupId(long transactionGroupId) {
         String whereClause = ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID + " = ?";
@@ -144,17 +123,17 @@ public class TransactionsDataSource {
         return rowsAffected;
 	}
 	
-	public Transaction getById(long id) {
-	    String selection = ExpenseContract.Transaction._ID + " = ?";
-        String[] selectionArgs = { Long.toString(id) };
-        List<Transaction> transactions = getList(selection, selectionArgs);
-        
-        if (transactions.size() == 0) {
-            return null;
-        }
-        
-        return transactions.get(0);
-	}
+//	public Transaction getById(long id) {
+//	    String selection = ExpenseContract.Transaction._ID + " = ?";
+//	    String[] selectionArgs = { Long.toString(id) };
+//	    List<Transaction> transactions = getList(selection, selectionArgs);
+//
+//	    if (transactions.size() == 0) {
+//	        return null;
+//	    }
+//
+//	    return transactions.get(0);
+//	}
 	
 	public List<Transaction> getListByTransactionGroupId(long transactionGroupId) {
         String selection = ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID + " = ?";

@@ -105,17 +105,14 @@ public final class TransactionGroupHelper {
     public static Map<Long, TransactionGroup> getMap(Context context) {
         ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(context);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
         TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
         Map<Long, TransactionGroup> transactionGroups = dataSource.getMapWithTransactions(null, null);
-        
-        Map<Long, Account> accounts = AccountHelper.getMap(db);
-        Map<Long, ExpenseCategory> expenseCategories = ExpenseCategoryHelper.getMap(db);
-
+        Map<Long, Account> accountsMap = AccountHelper.getMap(db);
+        Map<Long, ExpenseCategory> expenseCategoriesMap = ExpenseCategoryHelper.getMap(db);
         databaseHelper.close();
         
         for (TransactionGroup transactionGroup : transactionGroups.values()) {
-            populateChildren(transactionGroup, accounts, expenseCategories);
+            populateChildren(transactionGroup, accountsMap, expenseCategoriesMap);
         }
 
         return transactionGroups;
@@ -123,30 +120,37 @@ public final class TransactionGroupHelper {
     
     public static void populateChildren(
             TransactionGroup transactionGroup, 
-            List<Account> accounts, 
-            List<ExpenseCategory> expenseCategories) {
+            List<Account> accountsList, 
+            List<ExpenseCategory> expenseCategoriesList) {
         
-        Map<Long, Account> accountsMap = AccountHelper.convertListToMap(accounts);
-        Map<Long, ExpenseCategory> expenseCategoriesMap = ExpenseCategoryHelper.convertListToMap(expenseCategories);
+        Map<Long, Account> accountsMap = AccountHelper.convertListToMap(accountsList);
+        Map<Long, ExpenseCategory> expenseCategoriesMap = ExpenseCategoryHelper.convertListToMap(expenseCategoriesList);
         populateChildren(transactionGroup, accountsMap, expenseCategoriesMap);
     }
 
     private static void populateChildren(
             TransactionGroup transactionGroup, 
-            Map<Long, Account> accounts, 
-            Map<Long, ExpenseCategory> expenseCategories) {
+            Map<Long, Account> accountsMap, 
+            Map<Long, ExpenseCategory> expenseCategoriesMap) {
         
-        long expenseCategoryId = transactionGroup.getExpenseCategory().getId();
-        ExpenseCategory expenseCategory = expenseCategories.get(expenseCategoryId);
-        transactionGroup.setExpenseCategory(expenseCategory);
-        
-        long fromAccountId = transactionGroup.getFromAccount().getId();
-        Account fromAccount = accounts.get(fromAccountId);
-        transactionGroup.setFromAccount(fromAccount);
+        populateExpenseCategory(transactionGroup, expenseCategoriesMap);
+        populateFromAccount(transactionGroup, accountsMap);
         
         for (Transaction transaction : transactionGroup.getTransactions()) {
-            TransactionHelper.populateChildren(transaction, accounts);
+            TransactionHelper.populateToAccount(transaction, accountsMap);
         }
+    }
+    
+    private static void populateExpenseCategory(TransactionGroup transactionGroup, Map<Long, ExpenseCategory> expenseCategoriesMap) {
+        long expenseCategoryId = transactionGroup.getExpenseCategory().getId();
+        ExpenseCategory expenseCategory = expenseCategoriesMap.get(expenseCategoryId);
+        transactionGroup.setExpenseCategory(expenseCategory);
+    }
+    
+    private static void populateFromAccount(TransactionGroup transactionGroup, Map<Long, Account> accountsMap) {
+        long fromAccountId = transactionGroup.getFromAccount().getId();
+        Account fromAccount = accountsMap.get(fromAccountId);
+        transactionGroup.setFromAccount(fromAccount);
     }
 
 }

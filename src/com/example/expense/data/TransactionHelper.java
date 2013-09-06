@@ -11,12 +11,6 @@ public final class TransactionHelper {
     
     private TransactionHelper() {}
     
-    public static void populateChildren(Transaction transaction, Map<Long, Account> accounts) {
-        long toAccountId = transaction.getToAccount().getId();
-        Account toAccount = accounts.get(toAccountId);
-        transaction.setToAccount(toAccount);
-    }
-    
     public static Map<Long, Transaction> convertToMap(List<Transaction> list) {
         Map<Long, Transaction> map = new HashMap<Long, Transaction>();
         
@@ -25,6 +19,12 @@ public final class TransactionHelper {
         }
         
         return map;
+    }
+    
+    public static void populateToAccount(Transaction transaction, Map<Long, Account> accounts) {
+        long toAccountId = transaction.getToAccount().getId();
+        Account toAccount = accounts.get(toAccountId);
+        transaction.setToAccount(toAccount);
     }
 
 }

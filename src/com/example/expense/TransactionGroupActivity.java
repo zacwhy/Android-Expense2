@@ -79,6 +79,7 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
         } else {
             TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
             mTransactionGroup = dataSource.getWithTransactionsById(mTransactionGroupId);
+            TransactionGroupHelper.populateChildren(mTransactionGroup, accountsList, expenseCategoriesList);
         }
         
         databaseHelper.close();
@@ -98,8 +99,6 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
         getSpinnerToAccount().setAdapter(mToAccountArrayAdapter);
 	    
         if (!isInsertMode()) {
-            TransactionGroupHelper.populateChildren(mTransactionGroup, accountsList, expenseCategoriesList);
-            
             int position1 = expenseCategoryArrayAdapter.getPosition(mTransactionGroup.getExpenseCategory());
             getSpinnerExpenseCategory().setSelection(position1);
             
