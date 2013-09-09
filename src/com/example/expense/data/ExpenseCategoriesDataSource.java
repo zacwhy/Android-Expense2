@@ -11,95 +11,81 @@ import com.example.expense.models.ExpenseCategory;
 
 public class ExpenseCategoriesDataSource {
 
-	private SQLiteDatabase database;
-	//private ExpenseDbHelper dbHelper;
-	
-	private String[] allColumns = { 
-			ExpenseContract.ExpenseCategory._ID,
-			ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE
-	};
-	
-	public ExpenseCategoriesDataSource(SQLiteDatabase database) {
-		this.database = database;
-	}
+    private SQLiteDatabase mDb;
 
-//	public ExpenseCategoriesDataSource(Context context) {
-//		dbHelper = new ExpenseDbHelper(context);
-//	}
-//
-//	public void open() throws SQLException {
-//		database = dbHelper.getWritableDatabase();
-//	}
-//
-//	public void close() {
-//		dbHelper.close();
-//	}
-	
-	public long createExpenseCategory(String title) {
-		// Create a new map of values, where column names are the keys
-		ContentValues values = new ContentValues();
-		values.put(ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE, title);
-		
-		// Insert the new row, returning the primary key value of the new row
-		long newRowId = database.insert(
-				ExpenseContract.ExpenseCategory.TABLE_NAME,
-				null,
-				values);
-		
-//		Cursor cursor = database.query(ExpenseContract.ExpenseCategory.TABLE_NAME, allColumns, 
-//				ExpenseContract.ExpenseCategory._ID + " = " + insertId, null, null, null, null);
-//		cursor.moveToFirst();
-//		ExpenseCategory expenseCategory = cursorToExpenseCategory(cursor);
-//		cursor.close();
-		
-		return newRowId;
-	}
-	
-	public int updateExpenseCategory(long rowId, String title) {
-		// New value for one column
-		ContentValues values = new ContentValues();
-		values.put(ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE, title);
+    private static final String[] sAllColumns = { 
+        ExpenseContract.ExpenseCategory._ID,
+        ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE
+    };
 
-		// Which row to update, based on the ID
-		String selection = ExpenseContract.ExpenseCategory._ID + " LIKE ?";
-		String[] selectionArgs = { String.valueOf(rowId) };
+    public ExpenseCategoriesDataSource(SQLiteDatabase db) {
+        mDb = db;
+    }
 
-		int count = database.update(
-				ExpenseContract.ExpenseCategory.TABLE_NAME,
-				values,
-				selection,
-				selectionArgs);
+    public long insert(String name) {
+        ContentValues values = new ContentValues();
+        values.put(ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE, name);
+        return mDb.insert(ExpenseContract.ExpenseCategory.TABLE_NAME, null, values);
+    }
 
-		return count;
-	}
-	
-	public int deleteAll() {
-		int count = database.delete(ExpenseContract.ExpenseCategory.TABLE_NAME, "1", null);
-		return count;
-	}
+    public int update(long id, String name) {
+        ContentValues values = new ContentValues();
+        values.put(ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE, name);
+        String whereClause = ExpenseContract.ExpenseCategory._ID + " = ?";
+        String[] whereArgs = { String.valueOf(id) };
+        return mDb.update(ExpenseContract.ExpenseCategory.TABLE_NAME, values, whereClause, whereArgs);
+    }
 
-	public List<ExpenseCategory> getAll() {
-		List<ExpenseCategory> expenseCategories = new ArrayList<ExpenseCategory>();
+    public int deleteAll() {
+        String whereClause = "1";
+        String[] whereArgs = null;
+        return delete(whereClause, whereArgs);
+    }
 
-		Cursor cursor = database.query(ExpenseContract.ExpenseCategory.TABLE_NAME, allColumns,
-				null, null, null, null, null);
+    private int delete(String whereClause, String[] whereArgs) {
+        return mDb.delete(ExpenseContract.ExpenseCategory.TABLE_NAME, whereClause, whereArgs);
+    }
 
-		cursor.moveToFirst();
-		while (!cursor.isAfterLast()) {
-			ExpenseCategory expenseCategory = cursorToExpenseCategory(cursor);
-			expenseCategories.add(expenseCategory);
-			cursor.moveToNext();
-		}
-		
-		// Make sure to close the cursor
-		cursor.close();
-		return expenseCategories;
-	}
-	
-	private ExpenseCategory cursorToExpenseCategory(Cursor cursor) {
-		ExpenseCategory expenseCategory = new ExpenseCategory(cursor.getLong(0));
-		expenseCategory.setTitle(cursor.getString(1));
-		return expenseCategory;
-	}
+    public ExpenseCategory getById(long id) {
+        String selection = ExpenseContract.ExpenseCategory._ID + " = ?";
+        String[] selectionArgs = { String.valueOf(id) };
+        List<ExpenseCategory> list = getList(selection, selectionArgs);
+
+        if (list.size() <= 0) {
+            return null;
+        }
+
+        return list.get(0);
+    }
+
+    public List<ExpenseCategory> getList() {
+        return getList(null, null);
+    }
+
+    public List<ExpenseCategory> getList(String selection, String[] selectionArgs) {
+        List<ExpenseCategory> expenseCategories = new ArrayList<ExpenseCategory>();
+        Cursor cursor = getCursor(selection, selectionArgs);
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            ExpenseCategory expenseCategory = cursorToExpenseCategory(cursor);
+            expenseCategories.add(expenseCategory);
+            cursor.moveToNext();
+        }
+
+        // Make sure to close the cursor
+        cursor.close();
+        return expenseCategories;
+    }
+
+    private Cursor getCursor(String selection, String[] selectionArgs) {
+        return mDb.query(ExpenseContract.ExpenseCategory.TABLE_NAME, sAllColumns, selection, selectionArgs, null, null, null);
+    }
+
+    private ExpenseCategory cursorToExpenseCategory(Cursor cursor) {
+        ExpenseCategory expenseCategory = new ExpenseCategory(cursor.getLong(0));
+        expenseCategory.setName(cursor.getString(1));
+        return expenseCategory;
+    }
 
 }

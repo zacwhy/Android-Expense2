@@ -27,7 +27,6 @@ import com.example.expense.data.AccountHelper;
 import com.example.expense.data.ExpenseCategoryHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
-import com.example.expense.data.TransactionGroupsDataSource;
 import com.example.expense.models.Account;
 import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.Transaction;
@@ -70,31 +69,30 @@ public class TransactionGroupActivity extends FragmentActivity implements OnDate
         ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         
-        List<Account> accountsList = AccountHelper.getList(db);
-        List<ExpenseCategory> expenseCategoriesList = ExpenseCategoryHelper.getList(db);
+        List<ExpenseCategory> expenseCategoryList = ExpenseCategoryHelper.getList(db);
+        List<Account> accountList = AccountHelper.getList(db);
+        
+        Map<Long, ExpenseCategory> expenseCategoryMap = ExpenseCategoryHelper.convertListToMap(expenseCategoryList);
+        mAccountsMap = AccountHelper.convertListToMap(accountList);
         
         if (isInsertMode()) {
             mTransactionGroup = new TransactionGroup();
             mTransactionGroup.setDate(DateHelper.getCurrentDateOnly());
         } else {
-            TransactionGroupsDataSource dataSource = new TransactionGroupsDataSource(db);
-            mTransactionGroup = dataSource.getWithTransactionsById(mTransactionGroupId);
-            TransactionGroupHelper.populateChildren(mTransactionGroup, accountsList, expenseCategoriesList);
+            mTransactionGroup = TransactionGroupHelper.getById(db, mTransactionGroupId, expenseCategoryMap, mAccountsMap);
         }
         
         databaseHelper.close();
-        
-        mAccountsMap = AccountHelper.convertListToMap(accountsList);
 
-        ArrayAdapter<ExpenseCategory> expenseCategoryArrayAdapter= new ArrayAdapter<ExpenseCategory>(this, android.R.layout.simple_spinner_item, expenseCategoriesList);
+        ArrayAdapter<ExpenseCategory> expenseCategoryArrayAdapter= new ArrayAdapter<ExpenseCategory>(this, android.R.layout.simple_spinner_item, expenseCategoryList);
         expenseCategoryArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         getSpinnerExpenseCategory().setAdapter(expenseCategoryArrayAdapter);
 
-        ArrayAdapter<Account> fromAccountArrayAdapter = new ArrayAdapter<Account>(this, android.R.layout.simple_spinner_item, accountsList);
+        ArrayAdapter<Account> fromAccountArrayAdapter = new ArrayAdapter<Account>(this, android.R.layout.simple_spinner_item, accountList);
         fromAccountArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         getSpinnerFromAccount().setAdapter(fromAccountArrayAdapter);
 
-        mToAccountArrayAdapter = new ArrayAdapter<Account>(this, android.R.layout.simple_spinner_item, accountsList);
+        mToAccountArrayAdapter = new ArrayAdapter<Account>(this, android.R.layout.simple_spinner_item, accountList);
         mToAccountArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         getSpinnerToAccount().setAdapter(mToAccountArrayAdapter);
 	    

@@ -11,7 +11,7 @@ public class TransactionGroup {
     private int sequence;
     private ExpenseCategory expenseCategory;
     private Account fromAccount;
-    private List<Transaction> transactions;
+    private List<Transaction> transactionList;
     
     public TransactionGroup(long id) {
         this();
@@ -19,7 +19,7 @@ public class TransactionGroup {
     }
     
     public TransactionGroup() {
-        transactions = new ArrayList<Transaction>();
+        transactionList = new ArrayList<Transaction>();
     }
     
     public long getId() {
@@ -63,11 +63,11 @@ public class TransactionGroup {
     }
     
     public List<Transaction> getTransactions() {
-        return transactions;
+        return transactionList;
     }
     
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
+    public void setTransactions(List<Transaction> transactionList) {
+        this.transactionList = transactionList;
     }
 
 }

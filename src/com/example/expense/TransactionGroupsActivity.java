@@ -1,22 +1,31 @@
 package com.example.expense;
 
 import java.util.List;
+import java.util.Map;
 
 import android.app.ListActivity;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.example.expense.data.AccountHelper;
+import com.example.expense.data.ExpenseCategoryHelper;
+import com.example.expense.data.ExpenseDatabaseHelper;
 import com.example.expense.data.TransactionGroupHelper;
 import com.example.expense.helpers.SummaryListItemHelper;
+import com.example.expense.models.Account;
+import com.example.expense.models.ExpenseCategory;
 import com.example.expense.models.SummaryListItem;
 import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsActivity extends ListActivity {
 
+    private Map<Long, ExpenseCategory> mExpenseCategoryMap;
+    private Map<Long, Account> mAccountMap;
     private List<SummaryListItem> mListItems;
     private SummaryArrayAdapter mSummaryArrayAdapter;
     private int mPosition;
@@ -25,7 +34,13 @@ public class TransactionGroupsActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-        List<TransactionGroup> transactionGroupList = TransactionGroupHelper.getList(this);
+		ExpenseDatabaseHelper databaseHelper = new ExpenseDatabaseHelper(this);
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        mExpenseCategoryMap = ExpenseCategoryHelper.getMap(db);
+        mAccountMap = AccountHelper.getMap(db);
+        List<TransactionGroup> transactionGroupList = TransactionGroupHelper.getList(db, null, null, mExpenseCategoryMap, mAccountMap);
+        databaseHelper.close();
+        
         mListItems = SummaryListItemHelper.getListItems(transactionGroupList);
         SummaryListItemHelper.sort(mListItems);
         mSummaryArrayAdapter = new SummaryArrayAdapter(this, mListItems);
@@ -102,7 +117,7 @@ public class TransactionGroupsActivity extends ListActivity {
             mListItems.remove(oldListItem);
         }
         
-        TransactionGroup newTransactionGroup = TransactionGroupHelper.getById(this, id, true, true, false);
+        TransactionGroup newTransactionGroup = TransactionGroupHelper.getById(this, id, mExpenseCategoryMap, mAccountMap);
         SummaryListItem newListItem = SummaryListItemHelper.getListItem(newTransactionGroup);
         mListItems.add(newListItem);
         

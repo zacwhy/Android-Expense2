@@ -61,7 +61,7 @@ public final class SummaryListItemHelper {
         }
         
         if (transactionGroup.getTransactions().size() > 1) {
-            String expenseCategory = transactionGroup.getExpenseCategory().getTitle();
+            String expenseCategory = transactionGroup.getExpenseCategory().getName();
             String fromAccount = transactionGroup.getFromAccount().getName();
             int transactionCount = transactionGroup.getTransactions().size();
             return String.format("%s by %s (%s)", expenseCategory, fromAccount, transactionCount);

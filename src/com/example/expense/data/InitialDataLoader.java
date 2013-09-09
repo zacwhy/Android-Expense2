@@ -27,7 +27,7 @@ public final class InitialDataLoader {
 		dataSource.deleteAll();
 		
 		for (String title : Values.Categories) {
-			dataSource.createExpenseCategory(title);
+			dataSource.insert(title);
 		}
 	}
 
