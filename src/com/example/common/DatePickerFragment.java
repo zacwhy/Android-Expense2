@@ -1,4 +1,4 @@
-package com.example.expense;
+package com.example.common;
 
 import java.util.Calendar;
 
