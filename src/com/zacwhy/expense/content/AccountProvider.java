@@ -1,4 +1,4 @@
-package com.example.expense.content;
+package com.zacwhy.expense.content;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -10,7 +10,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.provider.BaseColumns;
 import android.text.TextUtils;
 
 import com.example.expense.data.ExpenseContract;
@@ -27,7 +26,7 @@ public class AccountProvider extends ContentProvider {
 
     private static final UriMatcher URI_MATCHER;
 
-    public static interface Accounts extends BaseColumns {
+    public static interface Accounts {
         public static final Uri CONTENT_URI = AccountProvider.CONTENT_URI;
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE + "/vnd.expense.accounts";
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/vnd.expense.accounts";
@@ -90,7 +89,7 @@ public class AccountProvider extends ContentProvider {
 
         case ACCOUNT_ID:
             String idString = uri.getLastPathSegment();
-            String where = Accounts._ID + " = " + idString;
+            String where = ExpenseContract.Account._ID + " = " + idString;
 
             if (!TextUtils.isEmpty(whereClause)) {
                 where += " AND " + whereClause;
@@ -143,7 +142,7 @@ public class AccountProvider extends ContentProvider {
             break;
         case ACCOUNT_ID:
             // limit query to one row at most:
-            builder.appendWhere(Accounts._ID + " = " + uri.getLastPathSegment());
+            builder.appendWhere(ExpenseContract.Account._ID + " = " + uri.getLastPathSegment());
             break;
         default:
             throw new IllegalArgumentException("Unsupported URI: " + uri);

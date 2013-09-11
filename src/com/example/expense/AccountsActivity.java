@@ -22,8 +22,8 @@ import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
-import com.example.expense.content.AccountProvider;
 import com.example.expense.data.ExpenseContract;
+import com.zacwhy.expense.content.AccountProvider;
 
 //
 // http://developer.android.com/guide/topics/ui/layout/listview.html
@@ -32,16 +32,13 @@ import com.example.expense.data.ExpenseContract;
 public class AccountsActivity extends ListActivity implements LoaderCallbacks<Cursor> {
 
     // This is the Adapter being used to display the list's data
-    SimpleCursorAdapter mAdapter;
+    private SimpleCursorAdapter mAdapter;
 
     // These are the Contacts rows that we will retrieve
-    static final String[] PROJECTION = new String[] {
+    private static final String[] PROJECTION = new String[] {
         ExpenseContract.Account._ID,
         ExpenseContract.Account.COLUMN_NAME_NAME
     };
-
-    // This is the select criteria
-    static final String SELECTION = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +91,7 @@ public class AccountsActivity extends ListActivity implements LoaderCallbacks<Cu
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // Now create and return a CursorLoader that will take care of
         // creating a Cursor for the data being displayed.
-        return new CursorLoader(this, AccountProvider.CONTENT_URI, PROJECTION, SELECTION, null, null);
+        return new CursorLoader(this, AccountProvider.CONTENT_URI, PROJECTION, null, null, null);
     }
 
     // Called when a previously created loader has finished loading
