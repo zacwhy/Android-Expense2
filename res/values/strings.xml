@@ -3,6 +3,7 @@
 
     <string name="action_accounts">Accounts</string>
     <string name="action_add">Add</string>
+    <string name="action_cancel">Cancel</string>
     <string name="action_delete">Delete</string>
     <string name="action_multiple_transactions">Multiple</string>
     <string name="action_ok">OK</string>
@@ -14,6 +15,7 @@
     <string name="content_description_calculator">Calculator</string>
     <string name="content_description_calendar">Calendar</string>
     <string name="error_required_amount">Amount is required!</string>
+    <string name="hint_account_name">Account Name</string>
     <string name="hint_amount">Amount</string>
     <string name="hint_description">Description</string>
     <string name="title_activity_accounts">Accounts</string>
