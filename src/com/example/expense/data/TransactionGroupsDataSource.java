@@ -215,7 +215,7 @@ public class TransactionGroupsDataSource {
                 ExpenseContract.TransactionGroup.COLUMN_NAME_DATE);
 
         Calendar universalTimeCalendar = DateHelper.getUniversalTime(calendar);
-        String dateTimeString = DateHelper.getSqlDateTimeString(universalTimeCalendar);
+        String dateTimeString = SqlHelper.getDateTimeString(universalTimeCalendar);
         Cursor cursor = mDb.rawQuery(sql, new String[] { dateTimeString, dateTimeString }); 
         cursor.moveToFirst();
 

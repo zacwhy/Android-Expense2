@@ -19,6 +19,12 @@
             android:exported="false"
             android:multiprocess="true" >
         </provider>
+        <provider
+            android:name="com.zacwhy.expense.content.SummaryProvider"
+            android:authorities="com.zacwhy.expense.provider.summaries"
+            android:exported="false"
+            android:multiprocess="true" >
+        </provider>
 
         <activity
             android:name="com.example.expense.MainActivity"
@@ -50,6 +56,10 @@
         <activity
             android:name="com.example.expense.AccountsActivity"
             android:label="@string/title_activity_accounts" >
+        </activity>
+        <activity
+            android:name="com.example.expense.SummariesActivity"
+            android:label="Summary" >
         </activity>
     </application>
 
