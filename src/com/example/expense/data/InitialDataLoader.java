@@ -3,36 +3,32 @@ package com.example.expense.data;
 import android.database.sqlite.SQLiteDatabase;
 
 public final class InitialDataLoader {
-    
+
     private InitialDataLoader() {}
-	
-	public static void initializeData(SQLiteDatabase database) {
-	    initializeAccounts(database);
-        initializeExpenseCategories(database);
-	}
-    
-	private static void initializeAccounts(SQLiteDatabase database) {
-	    AccountsDataSource dataSource = new AccountsDataSource(database);
 
-	    dataSource.deleteAll();
+    public static void initializeData(SQLiteDatabase db) {
+        initializeAccounts(db);
+        initializeExpenseCategories(db);
+    }
 
-	    for (String title : Values.Accounts) {
-	        dataSource.insert(title);
-	    }
-	}
+    private static void initializeAccounts(SQLiteDatabase db) {
+        AccountsDataSource dataSource = new AccountsDataSource(db);
 
-	private static void initializeExpenseCategories(SQLiteDatabase database) {
-		ExpenseCategoriesDataSource dataSource = new ExpenseCategoriesDataSource(database);
-		
-		dataSource.deleteAll();
-		
-		for (String title : Values.Categories) {
-			dataSource.insert(title);
-		}
-	}
+        for (String name : Values.Accounts) {
+            dataSource.insert(name);
+        }
+    }
 
-	private final static class Values {
-        
+    private static void initializeExpenseCategories(SQLiteDatabase db) {
+        ExpenseCategoriesDataSource dataSource = new ExpenseCategoriesDataSource(db);
+
+        for (String name : Values.Categories) {
+            dataSource.insert(name);
+        }
+    }
+
+    private final static class Values {
+
         public final static String[] Accounts = {
             "Expenditure",
             "Cash",
@@ -45,16 +41,16 @@ public final class InitialDataLoader {
             "POSB",
             "I", "M", "P", "R", "Other people"
         };
-	    
-	    public final static String[] Categories = {
-	        "None",
-	        //"Food", "Transport", "Others",
-	        "Breakfast", "Lunch", "Dinner", "Snack",
-	        "Bus", "Train", "Bus (Work)", "Train (Work)",
-	        "Fuel", "Road", "Parking",
-	        "Others"
-	    };
-	    
-	}
-	
+
+        public final static String[] Categories = {
+            "None",
+            //"Food", "Transport", "Others",
+            "Breakfast", "Lunch", "Dinner", "Snack",
+            "Bus", "Train", "Bus (Work)", "Train (Work)",
+            "Fuel", "Road", "Parking",
+            "Others"
+        };
+
+    }
+
 }
