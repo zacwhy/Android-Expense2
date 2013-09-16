@@ -69,7 +69,8 @@ public class SummaryProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
         case GROUP_BY_CATEGORY:
-            cursor = TransactionGroupsDataSource.queryGroupByCategory(mDb, selection, selectionArgs, sortOrder);
+            TransactionGroupsDataSource transactionGroupsDataSource = new TransactionGroupsDataSource(mDb);
+            cursor = transactionGroupsDataSource.queryGroupByCategory(selection, selectionArgs, sortOrder);
             break;
         default:
             throw new IllegalArgumentException("Unsupported URI: " + uri);
