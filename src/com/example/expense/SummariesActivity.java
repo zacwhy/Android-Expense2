@@ -24,6 +24,7 @@ import com.example.common.helpers.DateHelper;
 import com.example.common.helpers.FormatHelper;
 import com.example.common.helpers.SqlHelper;
 import com.example.expense.data.ExpenseContract;
+import com.example.expense.data.TransactionGroupsDataSource;
 import com.zacwhy.expense.content.SummaryProvider;
 
 public class SummariesActivity extends ListActivity implements LoaderCallbacks<Cursor> {
@@ -42,7 +43,7 @@ public class SummariesActivity extends ListActivity implements LoaderCallbacks<C
         ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
         root.addView(progressBar);
 
-        String[] from = { SummaryProvider.COLUMN_DESCRIPTION, SummaryProvider.COLUMN_AMOUNT };
+        String[] from = { TransactionGroupsDataSource.COLUMN_DESCRIPTION, TransactionGroupsDataSource.COLUMN_AMOUNT };
         int[] to = { R.id.label, R.id.amount };
         mAdapter = new SimpleCursorAdapter(this, R.layout.list_item_summary, null, from, to, 0);
 
@@ -90,7 +91,7 @@ public class SummariesActivity extends ListActivity implements LoaderCallbacks<C
                 " AND (%s.%s = 'Expenditure')",
                 ExpenseContract.TransactionGroup.TABLE_NAME,
                 ExpenseContract.TransactionGroup.COLUMN_NAME_DATE,
-                SummaryProvider.TABLE_TO_ACCOUNT,
+                TransactionGroupsDataSource.TABLE_TO_ACCOUNT,
                 ExpenseContract.Account.COLUMN_NAME_NAME);
 
         Calendar calendar = DateHelper.getFirstDayOfCurrentMonth();

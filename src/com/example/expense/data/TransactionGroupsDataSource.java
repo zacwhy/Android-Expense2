@@ -2,12 +2,14 @@ package com.example.expense.data;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 
 import com.example.common.helpers.DateHelper;
 import com.example.common.helpers.SqlHelper;
@@ -18,7 +20,26 @@ import com.example.expense.models.TransactionGroup;
 
 public class TransactionGroupsDataSource {
 
+    public static final String TABLE_TO_ACCOUNT = "to_account";
+    public static final String COLUMN_AMOUNT = "amount";
+    public static final String COLUMN_DESCRIPTION = "description";
+
     private static final String QUOTED_TABLE_NAME = SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME);
+    
+    private static final String YEAR = "year";
+    private static final String MONTH = "month";
+    
+    private static final String TRANSACTION = ExpenseContract.Transaction.TABLE_NAME;
+    private static final String TRANSACTION_TRANSACTION_GROUP_ID = ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID;
+    private static final String TRANSACTION_TO_ACCOUNT_ID = ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID;
+    private static final String TRANSACTION_GROUP = ExpenseContract.TransactionGroup.TABLE_NAME;
+    private static final String TRANSACTION_GROUP_ID = ExpenseContract.TransactionGroup._ID;
+    private static final String TRANSACTION_GROUP_EXPENSE_CATEGORY_ID = ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID;
+    private static final String EXPENSE_CATEGORY = ExpenseContract.ExpenseCategory.TABLE_NAME;
+    private static final String EXPENSE_CATEGORY_ID = ExpenseContract.ExpenseCategory._ID;
+    private static final String EXPENSE_CATEGORY_NAME = ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE;
+    private static final String ACCOUNT = ExpenseContract.Account.TABLE_NAME;
+    private static final String ACCOUNT_ID = ExpenseContract.Account._ID;
 
     private static final String[] sAllColumns = {
         ExpenseContract.TransactionGroup._ID,
@@ -227,6 +248,55 @@ public class TransactionGroupsDataSource {
         // Make sure to close the cursor
         cursor.close();
         return sequence;
+    }
+    
+    public List<Calendar> getDistinctCalendars() {
+        List<Calendar> calendars = new ArrayList<Calendar>();
+        
+        String sql = "SELECT DISTINCT" +
+                " strftime('%Y',datetime(" + SqlHelper.quote(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE) + "/1000, 'unixepoch')) AS " + SqlHelper.quote(YEAR) +
+                ", strftime('%m',datetime(" + SqlHelper.quote(ExpenseContract.TransactionGroup.COLUMN_NAME_DATE) + "/1000, 'unixepoch')) AS " + SqlHelper.quote(MONTH) +
+                " FROM " + SqlHelper.quote(ExpenseContract.TransactionGroup.TABLE_NAME) +
+                " ORDER BY " + SqlHelper.quote(YEAR) + ", " + SqlHelper.quote(MONTH);
+        
+        Cursor cursor = mDb.rawQuery(sql, null); 
+        cursor.moveToFirst();
+
+        while (!cursor.isAfterLast()) {
+            int year = Integer.parseInt(cursor.getString(0));
+            int month = Integer.parseInt(cursor.getString(1)) - 1;
+            Calendar calendar = new GregorianCalendar(year, month, 1);
+            calendars.add(calendar);
+            cursor.moveToNext();
+        }
+
+        cursor.close();
+        return calendars;
+    }
+    
+    public Cursor queryGroupByCategory(String selection, String[] selectionArgs, String sortOrder) {
+        return queryGroupByCategory(mDb, selection, selectionArgs, sortOrder);
+    }
+
+    private static Cursor queryGroupByCategory(SQLiteDatabase db, String selection, String[] selectionArgs, String sortOrder) {
+        String inTables = SqlHelper.quote(ExpenseContract.Transaction.TABLE_NAME) +
+                SqlHelper.leftOuterJoin(TRANSACTION_GROUP, TRANSACTION_GROUP_ID, TRANSACTION, TRANSACTION_TRANSACTION_GROUP_ID) +
+                SqlHelper.leftOuterJoin(EXPENSE_CATEGORY, EXPENSE_CATEGORY_ID, TRANSACTION_GROUP, TRANSACTION_GROUP_EXPENSE_CATEGORY_ID) +
+                SqlHelper.leftOuterJoin(ACCOUNT, ACCOUNT_ID, TRANSACTION, TRANSACTION_TO_ACCOUNT_ID, TABLE_TO_ACCOUNT);
+    
+        String[] projectionIn = {
+                SqlHelper.qualifiedColumn(EXPENSE_CATEGORY, EXPENSE_CATEGORY_ID),
+                SqlHelper.qualifiedColumn(EXPENSE_CATEGORY, EXPENSE_CATEGORY_NAME) + " AS " + SqlHelper.quote(COLUMN_DESCRIPTION),
+                SqlHelper.format("SUM(%s.%s) AS %s", TRANSACTION, ExpenseContract.Transaction.COLUMN_NAME_AMOUNT, COLUMN_AMOUNT)
+        };
+    
+        String groupBy = SqlHelper.qualifiedColumn(TRANSACTION_GROUP, TRANSACTION_GROUP_EXPENSE_CATEGORY_ID);
+        String having = null;
+    
+        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
+        builder.setTables(inTables);
+        Cursor cursor = builder.query(db, projectionIn, selection, selectionArgs, groupBy, having, sortOrder);
+        return cursor;
     }
 
 }

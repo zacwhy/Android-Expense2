@@ -5,33 +5,15 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
-import com.example.common.helpers.SqlHelper;
-import com.example.expense.data.ExpenseContract;
 import com.example.expense.data.ExpenseDatabaseHelper;
+import com.example.expense.data.TransactionGroupsDataSource;
 
 public class SummaryProvider extends ContentProvider {
 
     public static final String AUTHORITY = "com.zacwhy.expense.provider.summaries";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY  + "/" + Summaries.CONTENT_PATH);
-
-    public static final String TABLE_TO_ACCOUNT = "to_account";
-    public static final String COLUMN_DESCRIPTION = "description";
-    public static final String COLUMN_AMOUNT = "amount";
-
-    private static final String TRANSACTION = ExpenseContract.Transaction.TABLE_NAME;
-    private static final String TRANSACTION_TRANSACTION_GROUP_ID = ExpenseContract.Transaction.COLUMN_NAME_TRANSACTION_GROUP_ID;
-    private static final String TRANSACTION_TO_ACCOUNT_ID = ExpenseContract.Transaction.COLUMN_NAME_TO_ACCOUNT_ID;
-    private static final String TRANSACTION_GROUP = ExpenseContract.TransactionGroup.TABLE_NAME;
-    private static final String TRANSACTION_GROUP_ID = ExpenseContract.TransactionGroup._ID;
-    private static final String TRANSACTION_GROUP_EXPENSE_CATEGORY_ID = ExpenseContract.TransactionGroup.COLUMN_NAME_EXPENSE_CATEGORY_ID;
-    private static final String EXPENSE_CATEGORY = ExpenseContract.ExpenseCategory.TABLE_NAME;
-    private static final String EXPENSE_CATEGORY_ID = ExpenseContract.ExpenseCategory._ID;
-    private static final String EXPENSE_CATEGORY_NAME = ExpenseContract.ExpenseCategory.COLUMN_NAME_TITLE;
-    private static final String ACCOUNT = ExpenseContract.Account.TABLE_NAME;
-    private static final String ACCOUNT_ID = ExpenseContract.Account._ID;
 
     private static final int GROUP_BY_CATEGORY = 1;
 
@@ -57,12 +39,6 @@ public class SummaryProvider extends ContentProvider {
         if (mDb == null) {
             return false;
         }
-
-//        if (mDb.isReadOnly()) {
-//            mDb.close();
-//            mDb = null;
-//            return false;
-//        }
 
         return true;
     }
@@ -93,34 +69,13 @@ public class SummaryProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
         case GROUP_BY_CATEGORY:
-            cursor = queryGroupByCategory(mDb, selection, selectionArgs, sortOrder);
+            cursor = TransactionGroupsDataSource.queryGroupByCategory(mDb, selection, selectionArgs, sortOrder);
             break;
         default:
             throw new IllegalArgumentException("Unsupported URI: " + uri);
         }
 
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
-        return cursor;
-    }
-
-    private static Cursor queryGroupByCategory(SQLiteDatabase db, String selection, String[] selectionArgs, String sortOrder) {
-        String inTables = SqlHelper.quote(ExpenseContract.Transaction.TABLE_NAME) +
-                SqlHelper.leftOuterJoin(TRANSACTION_GROUP, TRANSACTION_GROUP_ID, TRANSACTION, TRANSACTION_TRANSACTION_GROUP_ID) +
-                SqlHelper.leftOuterJoin(EXPENSE_CATEGORY, EXPENSE_CATEGORY_ID, TRANSACTION_GROUP, TRANSACTION_GROUP_EXPENSE_CATEGORY_ID) +
-                SqlHelper.leftOuterJoin(ACCOUNT, ACCOUNT_ID, TRANSACTION, TRANSACTION_TO_ACCOUNT_ID, "to_account");
-
-        String[] projectionIn = {
-                SqlHelper.qualifiedColumn(EXPENSE_CATEGORY, EXPENSE_CATEGORY_ID),
-                SqlHelper.qualifiedColumn(EXPENSE_CATEGORY, EXPENSE_CATEGORY_NAME) + " AS " + SqlHelper.quote(COLUMN_DESCRIPTION),
-                SqlHelper.format("SUM(%s.%s) AS %s", TRANSACTION, ExpenseContract.Transaction.COLUMN_NAME_AMOUNT, COLUMN_AMOUNT)
-        };
-
-        String groupBy = SqlHelper.qualifiedColumn(TRANSACTION_GROUP, TRANSACTION_GROUP_EXPENSE_CATEGORY_ID);
-        String having = null;
-
-        SQLiteQueryBuilder builder = new SQLiteQueryBuilder();
-        builder.setTables(inTables);
-        Cursor cursor = builder.query(db, projectionIn, selection, selectionArgs, groupBy, having, sortOrder);
         return cursor;
     }
 

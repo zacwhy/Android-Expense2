@@ -67,6 +67,10 @@ public class TransactionGroupsActivity extends ListActivity {
             return true;
 
         case R.id.action_summary:
+            startActivity(new Intent(this, SummaryActivity.class));
+            return true;
+
+        case R.id.action_settings:
             startActivity(new Intent(this, SummariesActivity.class));
             return true;
         }

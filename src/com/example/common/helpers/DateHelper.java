@@ -11,6 +11,10 @@ public final class DateHelper {
 
     private DateHelper() {}
 
+    public static String format(Calendar calendar, String pattern) {
+        return new SimpleDateFormat(pattern).format(calendar.getTime());
+    }
+
     public static Calendar getCalendarFromMilliseconds(long millis) {
         Calendar calendar = new GregorianCalendar();
         calendar.setTimeInMillis(millis);
@@ -26,21 +30,21 @@ public final class DateHelper {
         return calendar;
     }
 
-    public static String getDateTimeString(Calendar date) {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z").format(date.getTime());
+    public static String getDateTimeString(Calendar calendar) {
+        return format(calendar, "yyyy-MM-dd HH:mm:ss Z");
     }
 
-    public static String getDateWithDayOfWeekString(Calendar date) {
-        return new SimpleDateFormat("yyyy-MM-dd E").format(date.getTime());
+    public static String getDateWithDayOfWeekString(Calendar calendar) {
+        return format(calendar, "yyyy-MM-dd E");
     }
 
     public static Calendar getFirstDayOfCurrentMonth() {
         return getFirstDayOfMonth(getCurrentDateOnly());
     }
 
-    public static String getShortDateString(Calendar date) {
+    public static String getShortDateString(Calendar calendar) {
         DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
-        return dateFormat.format(date.getTime());
+        return dateFormat.format(calendar.getTime());
     }
 
     public static Calendar getFirstDayOfMonth(Calendar calendar) {

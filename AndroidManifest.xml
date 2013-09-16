@@ -61,6 +61,10 @@
             android:name="com.example.expense.SummariesActivity"
             android:label="Summary" >
         </activity>
+        <activity
+            android:name="com.example.expense.SummaryActivity"
+            android:label="@string/title_activity_summary" >
+        </activity>
     </application>
 
 </manifest>
