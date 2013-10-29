@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import android.widget.Toast;
 import com.example.expense.data.AccountHelper;
 import com.example.expense.data.ExpenseCategoryHelper;
 import com.example.expense.data.ExpenseDatabaseHelper;
@@ -71,7 +72,9 @@ public class TransactionGroupsActivity extends ListActivity {
             return true;
 
         case R.id.action_settings:
-            startActivity(new Intent(this, SummariesActivity.class));
+            DatabaseExport.export();
+            Toast.makeText(getBaseContext(), "Copied", Toast.LENGTH_LONG).show();
+//            startActivity(new Intent(this, SummariesActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
